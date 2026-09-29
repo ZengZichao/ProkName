@@ -1,0 +1,57 @@
+{
+  "_provenance": {
+    "kind": "trimmed copy of an upstream-recorded HTTP fixture — NOT a prokname live capture",
+    "derived_from": "gnverifier/pkg/io/verifrest/fixtures/names.yaml:15 (gnames/gnverifier @ f73968c1); the body was recorded by the upstream project on 2021-12-06 against https://verifier.globalnames.org/api/v1/verifications",
+    "trimming": "the upstream recording's long classification strings and the names irrelevant to prokname were dropped, and the single retained entry was rewritten for the name prokname's tests query ('Escherichia coli', NCBI taxid 562). FIELD NAMES and the matchType / editDistance values are preserved verbatim from the upstream recording; the record content is therefore schema-conformant illustration, not a response the prokname test suite ever received.",
+    "live_capture": false,
+    "as_of": "2026-09-21",
+    "contract_pinned_by": [
+      "top level: metadata.namesNumber + names[]",
+      "names[].matchType is emitted NEXT TO names[].name; a non-matching name carries matchType 'NoMatch' and NO bestResult",
+      "names[].bestResult.matchType 'Exact' pairs with editDistance 0 in this recording",
+      "request body keys: nameStrings / withAllMatches / withVernaculars"
+    ],
+    "recorded_for": "the GNA exact-match contract: matchType 'Exact' paired with editDistance 0"
+  },
+  "request": {
+    "nameStrings": ["Escherichia coli"],
+    "dataSources": [],
+    "withAllMatches": false,
+    "withVernaculars": false,
+    "withCapitalization": false,
+    "withContext": false,
+    "contextThreshold": 0
+  },
+  "response": {
+    "metadata": { "namesNumber": 1, "dataSources": [4, 12] },
+    "names": [
+      {
+        "id": "744fa750-9087-5fda-b197-c44833c32bca",
+        "name": "Escherichia coli",
+        "matchType": "Exact",
+        "bestResult": {
+          "dataSourceId": 4,
+          "dataSourceTitleShort": "NCBI",
+          "curation": "NotCurated",
+          "recordId": "562",
+          "matchedName": "Escherichia coli",
+          "matchedCardinality": 2,
+          "matchedCanonicalSimple": "Escherichia coli",
+          "matchedCanonicalFull": "Escherichia coli",
+          "currentRecordId": "562",
+          "currentName": "Escherichia coli",
+          "currentCardinality": 2,
+          "currentCanonicalSimple": "Escherichia coli",
+          "currentCanonicalFull": "Escherichia coli",
+          "isSynonym": false,
+          "editDistance": 0,
+          "stemEditDistance": 0,
+          "matchType": "Exact"
+        },
+        "results": [],
+        "dataSourcesNum": 26,
+        "curation": "NotCurated"
+      }
+    ]
+  }
+}

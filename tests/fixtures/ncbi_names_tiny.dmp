@@ -1,0 +1,18 @@
+100	|	Syntheticus primus	|		|	scientific name	|
+101	|	Syntheticus primus	|	Syntheticus primus	|	synonym	|
+200	|	Woese 1987	|		|	authority	|
+201	|	Syntheticus mentitus	|		|	misspelling	|
+202	|	Syntheticus secundus	|		|	synonym	|
+203	|	Syntheticus tertius	|		|	genbank common name	|
+204	|	Syntheticus quartus	|		|	blast name	|
+205	|	Syntheticus quintus	|		|	includes	|
+206	|	Syntheticus sextus	|		|	anamorph	|
+207	|	Syntheticus septimus	|		|	teleomorph	|
+300	|	Syntheticus octavus	|		|	misspelling	|
+301	|	Syntheticus octavus	|		|	scientific name	|
+400	|	Syntheticus nonus	|		|	scientific name	|
+401	|	Syntheticus nonus	|		|	misspelling	|
+500	|	Syntheticus decimus	|		|	nonsense class	|
+600	|	Syntheticus undecimus	|		|	authority	|
+601	|	Syntheticus undecimus	|		|	synonym	|
+700	|	root	|		|	scientific name	|

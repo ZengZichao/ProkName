@@ -1,0 +1,30 @@
+{
+  "_meta": {
+    "version": "0.1.0-m0",
+    "note": "Inference-mode fallback used only when the lookup lexicon misses. Endings are heuristics, never authority: every inference result MUST be flagged needs_review. Known exceptions are listed with priority over generic endings. Calibration uses a development split disjoint from benchmark A-inference set.",
+    "priority": ["morpheme", "exception_ending", "generic_ending"]
+  },
+  "morphemes": {
+    "monas": "f",
+    "ella": "f",
+    "ia": "f",
+    "bacter": "m",
+    "coccus": "m",
+    "bacillus": "m",
+    "vibrio": "m",
+    "bacterium": "n",
+    "spira": "f"
+  },
+  "exception_endings": {
+    "ma": "n",
+    "on": "n",
+    "is": "f"
+  },
+  "generic_endings": {
+    "a": "f",
+    "um": "n",
+    "us": "m",
+    "er": "m",
+    "e": "n"
+  }
+}

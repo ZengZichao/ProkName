@@ -1,0 +1,762 @@
+{
+  "_meta": {
+    "version": "0.1.0-seed",
+    "suite": "A-set (gender determination)",
+    "note": "v0.1 seed for CI and development. Paper-grade A-set: ≥500 genera from LPSN stratified by gender, with holdout protocol (inference cases must NOT be in genus_gender.json). Full build is the M1 deliverable via official LPSN API export scripts.",
+    "target_sizes": {
+      "total": "≥500",
+      "inference_subset": "≥300 (must NOT be in published lexicon)"
+    },
+    "license": "CC BY-SA 4.0 (LPSN-derived)",
+    "case_count": 74,
+    "expanded": "2026-09-04: +55 curated inference cases (annotator=curated-seed); pending M0 LPSN API batch verification"
+  },
+  "cases": [
+    {
+      "genus": "Escherichia",
+      "label": "f",
+      "source": "lpsn",
+      "in_lexicon": true,
+      "lpsn_id": "1484",
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC BY-SA 4.0",
+      "grammatical_category": "gender"
+    },
+    {
+      "genus": "Salmonella",
+      "label": "f",
+      "source": "lpsn",
+      "in_lexicon": true,
+      "lpsn_id": "1485",
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC BY-SA 4.0",
+      "grammatical_category": "gender"
+    },
+    {
+      "genus": "Shigella",
+      "label": "f",
+      "source": "lpsn",
+      "in_lexicon": true,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC BY-SA 4.0",
+      "grammatical_category": "gender"
+    },
+    {
+      "genus": "Klebsiella",
+      "label": "f",
+      "source": "lpsn",
+      "in_lexicon": true,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC BY-SA 4.0",
+      "grammatical_category": "gender"
+    },
+    {
+      "genus": "Yersinia",
+      "label": "f",
+      "source": "lpsn",
+      "in_lexicon": true,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC BY-SA 4.0",
+      "grammatical_category": "gender"
+    },
+    {
+      "genus": "Pseudomonas",
+      "label": "f",
+      "source": "lpsn",
+      "in_lexicon": true,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC BY-SA 4.0",
+      "grammatical_category": "gender"
+    },
+    {
+      "genus": "Bacillus",
+      "label": "m",
+      "source": "lpsn",
+      "in_lexicon": true,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC BY-SA 4.0",
+      "grammatical_category": "gender"
+    },
+    {
+      "genus": "Staphylococcus",
+      "label": "m",
+      "source": "lpsn",
+      "in_lexicon": true,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC BY-SA 4.0",
+      "grammatical_category": "gender"
+    },
+    {
+      "genus": "Vibrio",
+      "label": "m",
+      "source": "lpsn",
+      "in_lexicon": true,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC BY-SA 4.0",
+      "grammatical_category": "gender"
+    },
+    {
+      "genus": "Thermus",
+      "label": "m",
+      "source": "lpsn",
+      "in_lexicon": true,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC BY-SA 4.0",
+      "grammatical_category": "gender"
+    },
+    {
+      "genus": "Clostridium",
+      "label": "n",
+      "source": "lpsn",
+      "in_lexicon": true,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC BY-SA 4.0",
+      "grammatical_category": "gender"
+    },
+    {
+      "genus": "Rhizobium",
+      "label": "n",
+      "source": "lpsn",
+      "in_lexicon": true,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC BY-SA 4.0",
+      "grammatical_category": "gender"
+    },
+    {
+      "genus": "Treponema",
+      "label": "n",
+      "source": "lpsn",
+      "in_lexicon": true,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC BY-SA 4.0",
+      "grammatical_category": "gender"
+    },
+    {
+      "genus": "Mycobacterium",
+      "label": "n",
+      "source": "lpsn",
+      "in_lexicon": true,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC BY-SA 4.0",
+      "grammatical_category": "gender"
+    },
+    {
+      "genus": "Streptomyces",
+      "label": "m",
+      "source": "lpsn",
+      "in_lexicon": true,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC BY-SA 4.0",
+      "grammatical_category": "gender"
+    },
+    {
+      "genus": "Exempluma",
+      "label": "n",
+      "source": "synthetic",
+      "in_lexicon": false,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC0",
+      "grammatical_category": "gender",
+      "note": "Greek -ma neuter, synthetic inference case"
+    },
+    {
+      "genus": "Closteridium",
+      "label": "n",
+      "source": "synthetic",
+      "in_lexicon": false,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC0",
+      "grammatical_category": "gender",
+      "note": "-um via inference, synthetic"
+    },
+    {
+      "genus": "Frankomonas",
+      "label": "f",
+      "source": "synthetic",
+      "in_lexicon": false,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC0",
+      "grammatical_category": "gender",
+      "note": "-monas morpheme, synthetic"
+    },
+    {
+      "genus": "Zzz",
+      "label": "unknown",
+      "source": "synthetic",
+      "in_lexicon": false,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC0",
+      "grammatical_category": "gender",
+      "note": "nothing known: refuse to guess"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Prevotella",
+      "label": "f",
+      "grammatical_category": "gender",
+      "note": "standard Latin -a-type feminine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Veillonella",
+      "label": "f",
+      "grammatical_category": "gender",
+      "note": "standard Latin -a-type feminine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Moraxella",
+      "label": "f",
+      "grammatical_category": "gender",
+      "note": "standard Latin -a-type feminine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Francisella",
+      "label": "f",
+      "grammatical_category": "gender",
+      "note": "standard Latin -a-type feminine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Brucella",
+      "label": "f",
+      "grammatical_category": "gender",
+      "note": "standard Latin -a-type feminine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Aeromonas",
+      "label": "f",
+      "grammatical_category": "gender",
+      "note": "standard Latin -a-type feminine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Plesiomonas",
+      "label": "f",
+      "grammatical_category": "gender",
+      "note": "standard Latin -a-type feminine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Morganella",
+      "label": "f",
+      "grammatical_category": "gender",
+      "note": "standard Latin -a-type feminine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Providencia",
+      "label": "f",
+      "grammatical_category": "gender",
+      "note": "standard Latin -a-type feminine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Serratia",
+      "label": "f",
+      "grammatical_category": "gender",
+      "note": "standard Latin -a-type feminine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Erwinia",
+      "label": "f",
+      "grammatical_category": "gender",
+      "note": "standard Latin -a-type feminine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Sphingomonas",
+      "label": "f",
+      "grammatical_category": "gender",
+      "note": "standard Latin -a-type feminine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Shewanella",
+      "label": "f",
+      "grammatical_category": "gender",
+      "note": "standard Latin -a-type feminine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Alteromonas",
+      "label": "f",
+      "grammatical_category": "gender",
+      "note": "standard Latin -a-type feminine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Cellulomonas",
+      "label": "f",
+      "grammatical_category": "gender",
+      "note": "standard Latin -a-type feminine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Syntrophomonas",
+      "label": "f",
+      "grammatical_category": "gender",
+      "note": "standard Latin -a-type feminine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Thermotoga",
+      "label": "f",
+      "grammatical_category": "gender",
+      "note": "standard Latin -a-type feminine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Methanosaeta",
+      "label": "f",
+      "grammatical_category": "gender",
+      "note": "standard Latin -a-type feminine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Porphyromonas",
+      "label": "f",
+      "grammatical_category": "gender",
+      "note": "standard Latin -a-type feminine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Wolinella",
+      "label": "f",
+      "grammatical_category": "gender",
+      "note": "standard Latin -a-type feminine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Acetobacter",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Gluconobacter",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Geobacter",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Pelagibacter",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Marinobacter",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Arthrobacter",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Micrococcus",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Rhodococcus",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Haemophilus",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Proteus",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Sulfolobus",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Acidianus",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Thermoproteus",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Thermococcus",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Pyrococcus",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Desulfurococcus",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Halococcus",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Methanococcus",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Methanobrevibacter",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Methanothermus",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Syntrophobacter",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Hydrogenobacter",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Chloroflexus",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Azotobacter",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Deinococcus",
+      "label": "m",
+      "grammatical_category": "gender",
+      "note": "standard -us/-bacter-type masculine; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Mycoplasma",
+      "label": "n",
+      "grammatical_category": "gender",
+      "note": "Greek -ma neuter / -um neuter; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Ureaplasma",
+      "label": "n",
+      "grammatical_category": "gender",
+      "note": "Greek -ma neuter / -um neuter; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Spiroplasma",
+      "label": "n",
+      "grammatical_category": "gender",
+      "note": "Greek -ma neuter / -um neuter; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Phytoplasma",
+      "label": "n",
+      "grammatical_category": "gender",
+      "note": "Greek -ma neuter / -um neuter; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Chromatium",
+      "label": "n",
+      "grammatical_category": "gender",
+      "note": "Greek -ma neuter / -um neuter; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Pyrobaculum",
+      "label": "n",
+      "grammatical_category": "gender",
+      "note": "Greek -ma neuter / -um neuter; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Methanomicrobium",
+      "label": "n",
+      "grammatical_category": "gender",
+      "note": "Greek -ma neuter / -um neuter; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Methanospirillum",
+      "label": "n",
+      "grammatical_category": "gender",
+      "note": "Greek -ma neuter / -um neuter; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Methanogenium",
+      "label": "n",
+      "grammatical_category": "gender",
+      "note": "Greek -ma neuter / -um neuter; LPSN API batch verification pending (M0)"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC BY-SA 4.0",
+      "genus": "Methanobacterium",
+      "label": "n",
+      "grammatical_category": "gender",
+      "note": "Greek -ma neuter / -um neuter; LPSN API batch verification pending (M0)"
+    }
+  ]
+}

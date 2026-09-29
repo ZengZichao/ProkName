@@ -1,0 +1,19 @@
+# prokname — direct runtime dependencies, expressed as ranges
+#
+# This file mirrors `[project].dependencies` in pyproject.toml for a quick
+# `pip install -r requirements.txt`. It is NOT a lockfile: versions are
+# range-constrained, and the authoritative dependency declaration is
+# pyproject.toml. For a reproducible, hash-pinned install, generate a real
+# lock from it:
+#   pip install pip-tools && pip-compile --strip-extras --generate-hashes pyproject.toml
+#
+# Only the two *direct* imports are listed. The transitive pins that used to
+# be copied here by hand (click, markdown-it-py, pygments, shellingham,
+# typing-extensions — all pulled in by typer/rich) have been removed: they
+# duplicated metadata pip already resolves, drifted out of date as soon as
+# typer or rich bumped their own requirements, and made this file look like a
+# lockfile while pretending not to be one. If the project ever needs to pin a
+# transitive package, add it to pyproject.toml so it is declared once.
+
+typer>=0.12,<1.0
+rich>=13.0,<15.0

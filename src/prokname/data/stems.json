@@ -1,0 +1,40 @@
+{
+  "_meta": {
+    "version": "0.1.0-m0",
+    "note": "User-extensible stem library. Shipped entries are illustrative seeds; real usage is via CLI input (stems need not pre-exist here). grammatical_category drives which suffix table applies."
+  },
+  "stems": [
+    {
+      "id": "wukong",
+      "source_word": "Wukong",
+      "language": "transliterated",
+      "type": "feature",
+      "grammatical_category": "adjective",
+      "stem": "wukong",
+      "stem_ending": "consonant",
+      "connecting_vowel": "o",
+      "notes": "transliterated proper noun used as a feature word"
+    },
+    {
+      "id": "boyd",
+      "source_word": "Boyd",
+      "language": "transliterated",
+      "type": "person",
+      "grammatical_category": "genitive",
+      "person_gender": "male",
+      "stem": "boyd",
+      "stem_ending": "consonant",
+      "notes": "person genitive: ending decided by honoured person's gender and stem-final character, independent of genus gender"
+    },
+    {
+      "id": "beijing",
+      "source_word": "Beijing",
+      "language": "transliterated",
+      "type": "place",
+      "grammatical_category": "adjective",
+      "stem": "beijing",
+      "stem_ending": "consonant",
+      "notes": "place adjective -ensis/-ensis/-ense"
+    }
+  ]
+}

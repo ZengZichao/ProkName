@@ -1,0 +1,261 @@
+{
+  "version": "0.2.0-m0",
+  "status": "M0 draft: only cells verified against real LPSN names or the ICNP orthography appendix are populated as verified. Anything flagged verified:false is a documented PROPOSAL — the engine must never assert compliance from it.",
+  "rank_suffix": {
+    "phylum": "ota",
+    "class": "ia",
+    "subclass": "idae",
+    "order": "ales",
+    "suborder": "ineae",
+    "family": "aceae",
+    "subfamily": "oideae",
+    "tribe": "eae",
+    "subtribe": "inae",
+    "genus": null,
+    "species": null,
+    "subspecies": null
+  },
+  "rank_suffix_policy": {
+    "_note": "The suffix table above separates mandatory ICNP terminations from terminations borrowed from the botanical code for intermediate ranks. The strength is explicit. The engine only asserts compliance for a suprageneric name whose stem is verified AND whose name is attested in data/type_genus_stems.json ('attested_higher_rank_names').",
+    "phylum": {
+      "strength": "recommended_by_seqcode",
+      "mandatory_under": "SeqCode recommendation (phyla should end in -ota); ICNP 2022 list of suprageneric terminations",
+      "verified": true,
+      "source": "seqcode-documentation/guide/curation.md:161-164 (local snapshot)"
+    },
+    "class": {
+      "strength": "recommended_by_seqcode",
+      "mandatory_under": "SeqCode recommendation (classes should end in -ia); conserved historical class names are listed in conserved_names",
+      "verified": true,
+      "source": "seqcode-documentation/guide/curation.md:161-164 (local snapshot)"
+    },
+    "order": {
+      "strength": "mandatory_icnp",
+      "mandatory_under": "ICNP: order names are formed from the stem of the type-genus name + -ales",
+      "verified": true,
+      "source": "ICNP suprageneric rules; rule number not re-verified locally (rule_citation_status in type_genus_stems.json)",
+      "rule_citation_status": "verified: false"
+    },
+    "family": {
+      "strength": "mandatory_icnp",
+      "mandatory_under": "ICNP: family names are formed from the stem of the type-genus name + -aceae",
+      "verified": true,
+      "source": "ICNP suprageneric rules; rule number not re-verified locally (rule_citation_status in type_genus_stems.json)",
+      "rule_citation_status": "verified: false"
+    },
+    "subclass": {
+      "strength": "adopted_botanical_code_convention",
+      "mandatory_under": "not mandatory under ICNP; adopted from the botanical code for intermediate ranks",
+      "verified": false
+    },
+    "suborder": {
+      "strength": "adopted_botanical_code_convention",
+      "mandatory_under": "not mandatory under ICNP; adopted from the botanical code for intermediate ranks",
+      "verified": false
+    },
+    "subfamily": {
+      "strength": "adopted_botanical_code_convention",
+      "mandatory_under": "not mandatory under ICNP; adopted from the botanical code for intermediate ranks",
+      "verified": false
+    },
+    "tribe": {
+      "strength": "adopted_botanical_code_convention",
+      "mandatory_under": "not mandatory under ICNP; adopted from the botanical code for intermediate ranks",
+      "verified": false
+    },
+    "subtribe": {
+      "strength": "adopted_botanical_code_convention",
+      "mandatory_under": "not mandatory under ICNP; adopted from the botanical code for intermediate ranks",
+      "verified": false
+    },
+    "genus": { "strength": "no_mandatory_suffix", "verified": true },
+    "species": { "strength": "no_mandatory_suffix", "verified": true },
+    "subspecies": { "strength": "no_mandatory_suffix", "verified": true }
+  },
+  "rank_suffix_examples": {
+    "phylum": ["Pseudomonadota", "Crenarchaeota"],
+    "class": ["Clostridia", "Methanobacteria"],
+    "subclass": ["Acidimicrobidae"],
+    "order": ["Bacillales"],
+    "suborder": ["Corynebacterineae"],
+    "family": ["Bacillaceae", "Streptomycetaceae", "Clostridiaceae"],
+    "subfamily": ["Bacilloideae"],
+    "tribe": ["Lactobacilleae"],
+    "subtribe": ["Streptomycinae"]
+  },
+  "rank_suffix_example_type_genera": {
+    "_note": "B1 machine check: scripts/verify_examples.py asserts generate(<type_genus>, 'feature', <rank>) reproduces every name in rank_suffix_examples. A name without a type genus here FAILS the check — typification is part of the rule, so a place name or an arbitrary string must never carry a -aceae suffix.",
+    "Pseudomonadota": "Pseudomonas",
+    "Crenarchaeota": "Crenarchaeum",
+    "Clostridia": "Clostridium",
+    "Methanobacteria": "Methanobacterium",
+    "Acidimicrobidae": "Acidimicrobium",
+    "Bacillales": "Bacillus",
+    "Corynebacterineae": "Corynebacterium",
+    "Bacillaceae": "Bacillus",
+    "Streptomycetaceae": "Streptomyces",
+    "Clostridiaceae": "Clostridium",
+    "Bacilloideae": "Bacillus",
+    "Lactobacilleae": "Lactobacillus",
+    "Streptomycinae": "Streptomyces"
+  },
+  "conserved_name_notes": [
+    "Class 'Bacilli' and 'Gammaproteobacteria' are conserved historical class names that do not end in -ia; the engine must NOT flag them as errors.",
+    "Old phylum names such as 'Proteobacteria' are transitional retained names.",
+    "'Bacillia' is NOT a name: the class of Bacillus is the protected name 'Bacilli' (data/type_genus_stems.json higher_rank_exceptions). generate('Bacillus'|'Bacill', ..., 'class') must return 'Bacilli'."
+  ],
+  "conserved_names": [
+    "Bacilli",
+    "Clostridia",
+    "Methanobacteria",
+    "Gammaproteobacteria",
+    "Alphaproteobacteria",
+    "Betaproteobacteria",
+    "Deltaproteobacteria",
+    "Omegaproteobacteria",
+    "Proteobacteria",
+    "Firmicutes",
+    "Cyanobacteria",
+    "Bacteroidetes",
+    "Chlamydiae",
+    "Spirochaetes",
+    "Thermotogae",
+    "Aquificae"
+  ],
+  "conserved_names_detail": {
+    "_note": "Conserved / protected / transitional suprageneric names the suffix rules must not be applied to. Only entries verified:true are treated as sourced; the rest await M0 sign-off against the ICNP lists (the code text itself is not in this repository).",
+    "Bacilli": { "rank": "class", "kind": "protected", "verified": true, "source": "ICNP list of protected names; LPSN lists Bacilli as the class of Bacillaceae" },
+    "Clostridia": { "rank": "class", "kind": "regular_elided_ia", "verified": true, "source": "LPSN — stem 'clostridi' + -ia with vowel coalescence, NOT an exception" },
+    "Methanobacteria": { "rank": "class", "kind": "regular_elided_ia", "verified": true, "source": "LPSN — stem 'methanobacteri' + -ia with vowel coalescence" },
+    "Gammaproteobacteria": { "rank": "class", "kind": "transitional", "verified": true, "source": "LPSN / ICNP transitional -proteobacteria class names" },
+    "Alphaproteobacteria": { "rank": "class", "kind": "transitional", "verified": true, "source": "LPSN / ICNP transitional -proteobacteria class names" },
+    "Betaproteobacteria": { "rank": "class", "kind": "transitional", "verified": true, "source": "LPSN / ICNP transitional -proteobacteria class names" },
+    "Deltaproteobacteria": { "rank": "class", "kind": "transitional", "verified": true, "source": "LPSN / ICNP transitional -proteobacteria class names" },
+    "Omegaproteobacteria": { "rank": "class", "kind": "transitional", "verified": false, "source": "name is in use; the rank/kind attribution was not re-verified locally" },
+    "Proteobacteria": { "rank": "phylum", "kind": "transitional", "verified": true, "source": "LPSN transitional name; replaced by Pseudomonadota" },
+    "Firmicutes": { "rank": "phylum", "kind": "transitional", "verified": true, "source": "LPSN transitional name; replaced by Bacillota" },
+    "Cyanobacteria": { "rank": "phylum", "kind": "transitional", "verified": true, "source": "LPSN transitional name; replaced by Cyanobacteriota" },
+    "Bacteroidetes": { "rank": "phylum", "kind": "transitional", "verified": true, "source": "LPSN transitional name; replaced by Bacteroidota" },
+    "Chlamydiae": { "rank": "phylum", "kind": "botanical_style_ae", "verified": false, "source": "-ae style phylum name; kind/authority not re-verified locally" },
+    "Spirochaetes": { "rank": "phylum", "kind": "botanical_style_e", "verified": false, "source": "-es style phylum name; kind/authority not re-verified locally" },
+    "Thermotogae": { "rank": "phylum", "kind": "botanical_style_ae", "verified": false, "source": "-ae style phylum name; kind/authority not re-verified locally" },
+    "Aquificae": { "rank": "phylum", "kind": "botanical_style_ae", "verified": false, "source": "-ae style phylum name; kind/authority not re-verified locally" }
+  },
+  "epithet_adjective": {
+    "place": { "m": "ensis", "f": "ensis", "n": "ense" },
+    "second_declension": { "m": "us", "f": "a", "n": "um" },
+    "third_declension": { "m": "is", "f": "is", "n": "e" },
+    "loving": { "m": "philus", "f": "phila", "n": "philum" },
+    "nourishing": { "m": "trophicus", "f": "trophica", "n": "trophicum" },
+    "origin_icus": { "m": "icus", "f": "ica", "n": "icum" },
+    "origin_inus": { "m": "inus", "f": "ina", "n": "inum" },
+    "resembling_eus": { "m": "eus", "f": "ea", "n": "eum" }
+  },
+  "epithet_adjective_notes": {
+    "nourishing": "Paradigm anchored to real LPSN names (Streptomyces autotrophicus m / Pseudonocardia autotrophica f). A bare '-trophus/-tropha/-trophum' paradigm, if sanctioned by the ICNP orthography appendix, is an M0 sign-off item — not guessable from memory.",
+    "third_declension_examples": ["Bacillus subtilis (m)", "Vibrio vulgaris (m)", "Xanthomonas campestris (f)", "Rhodopseudomonas palustris (f)"],
+    "third_declension_removed_examples": "'Clostridium tertium' is not a noun-in-apposition example: -ium/-um is 2nd-declension neuter, and classifying it as one only appeared to pass because an unanalysable ending was mistaken for a noun in apposition.",
+    "third_declension_caveat": "Many -is epithets are common-gender (they do not switch to -e in the neuter), e.g. Mycobacterium tuberculosis — those are handled through epithet_indeclinable, never by forcing -e.",
+    "loving_examples": ["Thermus thermophilus (m)"],
+    "origin_icus_examples": ["Thermus aquaticus (m, place)", "Lactobacillus helveticus (m, place, 'of Zurich')"],
+    "origin_icus_verified": true,
+    "origin_inus_verified": false,
+    "origin_inus_note": "-inus/-a/-um provenance adjectives are attested in classical toponymics, but no LPSN instance was inspected for this repository — M0 sign-off item.",
+    "resembling_eus_verified": false,
+    "resembling_eus_note": "-eus/-ea/-eion Greek 'resembling' adjectives: no prokaryotic instance inspected — M0 sign-off item."
+  },
+  "place_adjective_formations": {
+    "_note": "M2: a place epithet is not restricted to the -ensis/-ense family. validate_agreement() tries these formations in order and returns True for the first whose GENDER-FORM matches; a match on another gender's form is positive evidence of disagreement (False); no match at all is a needs-review, never a guessed False.",
+    "formations": ["place", "origin_icus", "origin_inus", "second_declension", "third_declension"],
+    "verified": true,
+    "source": "anchors: Klebsiella michiganensis / Rhizobium mongolense (-ensis), Thermus aquaticus / Lactobacillus helveticus (-icus), Rhodopseudomonas palustris (3rd decl.)"
+  },
+  "epithet_indeclinable": {
+    "_note": "M2: the 4th grammatical category — participle / common-gender adjective. Such epithets have ONE form for m, f and n, so gender agreement cannot fail and they must never be labelled 'noun in apposition'. storage/etymology.py renders them as 'N.L. part. adj.' / 'N.L. adj. common'.",
+    "endings": [
+      { "ending": "ans", "kind": "participle", "verified": true, "source": "LPSN: Comamonas denitrificans, Bacillus… (-ans, present participle)" },
+      { "ending": "ens", "kind": "participle", "verified": true, "source": "LPSN: Clostridium perfringens, Agrobacterium tumefaciens, Methylobacterium extorquens, Bacillus halodurans (-ans/-ens)" }
+    ],
+    "anchors": [
+      { "epithet": "perfringens", "kind": "participle", "example": "Clostridium perfringens", "verified": true, "source": "LPSN" },
+      { "epithet": "tumefaciens", "kind": "participle", "example": "Agrobacterium tumefaciens", "verified": true, "source": "LPSN" },
+      { "epithet": "denitrificans", "kind": "participle", "example": "Comamonas denitrificans", "verified": true, "source": "LPSN" },
+      { "epithet": "halodurans", "kind": "participle", "example": "Bacillus halodurans", "verified": true, "source": "LPSN" },
+      { "epithet": "extorquens", "kind": "participle", "example": "Methylobacterium extorquens", "verified": true, "source": "LPSN" },
+      { "epithet": "pyogenes", "kind": "indeclinable_adjective", "example": "Streptococcus pyogenes", "verified": true, "source": "LPSN etymology 'N.L. adj. pyogenes' (Greek -ες, common gender)" },
+      { "epithet": "tuberculosis", "kind": "indeclinable_adjective", "example": "Mycobacterium tuberculosis", "verified": true, "source": "LPSN; disease-name adjective that does not switch to -e before a neuter genus" },
+      { "epithet": "mycoides", "kind": "indeclinable_adjective", "example": "Mycoplasma mycoides", "verified": true, "source": "LPSN (-eides 'resembling', common gender)" },
+      { "epithet": "coli", "kind": "genitive_noun", "example": "Escherichia coli", "verified": false, "source": "LPSN gives 'N.L. gen. n. coli, of the colon' i.e. a GENITIVE noun, not a noun in apposition (needs expert sign-off; until then it is attested only as indeclinable)" }
+    ]
+  },
+  "epithet_invariant": {
+    "inhabitant": {
+      "ending": "cola",
+      "category": "appositive",
+      "indeclinable": true,
+      "verified": false,
+      "source": "compound in -cola ('inhabitant of …') is indeclinable in Latin apart from the vocative; no LPSN instance was inspected for this repository — M0 sign-off item",
+      "note": "Consumed by engine/validate.py and engine/generate.py — an epithet ending in -cola is never declined for the genus gender, but because the rule is unverified the verdict is needs_review (compliant=None), never a silent ✓."
+    }
+  },
+  "prohibited_patterns": {
+    "_note": "B2: explicit ICNP prohibitions that the engine must gate on. Consumed by engine/validate.py::_prohibited_hits and engine/generate.py (self-referential epithet / already-inflected stem). 'verdict' says what validate must return: 'non_compliant' can never be True, 'needs_review' refuses to assert anything.",
+    "rules": [
+      {
+        "id": "epithet_identical_to_genus",
+        "detect": "epithet_equals_genus",
+        "verdict": "non_compliant",
+        "verified": true,
+        "source": "ICNP Rule 20 note — the specific epithet may not repeat the name of the genus",
+        "example": "Bacillus bacillus"
+      },
+      {
+        "id": "epithet_latinized_repeat_of_genus",
+        "detect": "epithet_is_genus_plus_inflectional_ending",
+        "verdict": "non_compliant",
+        "verified": true,
+        "source": "ICNP Rule 20 note — nor may it be the latinized form of the genus name",
+        "example": "Bacillus bacillusus / Streptomyces streptomycesus"
+      },
+      {
+        "id": "epithet_repeated_inflection",
+        "detect": "epithet_ends_with_doubled_paradigm_ending",
+        "verdict": "needs_review",
+        "verified": true,
+        "source": "orthographic defect: the supplied stem already carried the paradigm ending (stem 'tunicensis' + -ensis)",
+        "example": "Bacillus tunicensisensis"
+      },
+      {
+        "id": "higher_rank_name_not_from_a_type_genus_stem",
+        "detect": "suprageneric_suffix_on_a_non_genus_stem",
+        "verdict": "needs_review",
+        "verified": true,
+        "source": "family/order/class/phylum names are formed from the stem of a TYPE GENUS name — a place or personal stem cannot carry -aceae (bench seed 'Beijingaceae')",
+        "example": "Beijingaceae"
+      },
+      {
+        "id": "epithet_not_analysable",
+        "detect": "no_paradigm_and_no_attested_anchor",
+        "verdict": "needs_review",
+        "verified": true,
+        "source": "control experiment: an arbitrary string ('qqqzz') must not be classified as a noun in apposition and stamped compliant",
+        "example": "Bacillus qqqzz"
+      }
+    ]
+  },
+  "epithet_type_to_category": {
+    "place": "adjective",
+    "person": "genitive",
+    "thing": "genitive",
+    "feature": ["adjective", "participle", "appositive"]
+  },
+  "genus_formation_hints": {
+    "_note": "Genus names have no mandatory suffix; these endings are optional, non-binding suggestions exposed by the CLI (--genus-suffix).",
+    "suggestions": {
+      "feature": ["monas", "bacter", "coccus", "vibrio"],
+      "place": null,
+      "person": ["ella", "ia"]
+    }
+  },
+  "connecting_vowel": "o"
+}

@@ -1,0 +1,85 @@
+{
+  "_meta": {
+    "version": "0.1.0",
+    "created": "2026-08-17",
+    "description": "Rate-limit budget table for benchmark corpus construction. Entry to be reviewed at M2 delivery.",
+    "budget_source": "Pacing measured against the upstream services; the SeqCode Registry publishes no rate limit"
+  },
+  "lpsn": {
+    "base_url": "https://api.lpsn.dsmz.de/",
+    "auth": "Keycloak (free registration required)",
+    "rate_limit": {
+      "max_requests_per_second": 1.0,
+      "max_concurrent": 1,
+      "burst_capacity": 5
+    },
+    "estimated_calls": {
+      "a_set": {
+        "description": "A-set genus gender lookup (≥500 genera)",
+        "count": 500
+      },
+      "b1_set": {
+        "description": "B1-set species agreement validation (≥1000 species names)",
+        "count": 1000
+      },
+      "b2_set": {
+        "description": "B2-set generation exact-match (≥300 records)",
+        "count": 300
+      },
+      "cross_validation": {
+        "description": "Cross-validation and dedup verification margin",
+        "count": 700
+      },
+      "total": 2500
+    },
+    "estimated_time": {
+      "at_1_rps": "2500 seconds ≈ 42 minutes",
+      "with_caching_and_retry": "≈ 30-45 minutes (cache hit rate ~40%)"
+    },
+    "retry_strategy": {
+      "max_retries": 3,
+      "backoff": "exponential (2^n seconds)",
+      "retry_on": [429, 500, 502, 503, 504]
+    },
+    "caching": {
+      "ttl_days": 7,
+      "cache_by": "name + source + date",
+      "checkpoint_resume": true,
+      "description": "Successful results cached by name + source + date. Checkpoint/resume enabled for long batch runs."
+    }
+  },
+  "seqcode": {
+    "base_url": "https://registry.seqco.de/",
+    "auth": "none (public API)",
+    "rate_limit": {
+      "max_requests_per_second": 2.0,
+      "max_concurrent": 2
+    },
+    "estimated_calls": {
+      "full_export": {
+        "description": "Full SeqCode Registry export for local corpus",
+        "count": 1
+      },
+      "d_set": {
+        "description": "D-set routing verification (≥60 cases)",
+        "count": 60
+      },
+      "total": 61
+    },
+    "estimated_time": "≈ 5 minutes (bulk export + individual queries)"
+  },
+  "ncbi_taxdump": {
+    "source": "ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz",
+    "auth": "none",
+    "rate_limit": "none (bulk download, local parse)",
+    "estimated_calls": {
+      "download": 1,
+      "local_parse": "names.dmp + nodes.dmp parsed locally (no API calls)"
+    },
+    "estimated_time": "≈ 10 minutes (download + parse ~4GB archive)"
+  },
+  "review_schedule": {
+    "m2_delivery": "Review actual call counts vs estimates; adjust budget if exceeded.",
+    "post_m6": "Annual review aligned with LPSN/SeqCode API changes."
+  }
+}

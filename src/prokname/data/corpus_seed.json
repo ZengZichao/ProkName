@@ -1,0 +1,30 @@
+{
+  "_meta": {
+    "version": "0.1.0-m0",
+    "corpus_date": "2026-08-16",
+    "provenance": [
+      { "source": "LPSN", "license": "CC BY-SA 4.0", "note": "names to be re-exported via official API/downloads only; scraping is forbidden" },
+      { "source": "SeqCode Registry", "license": "CC-BY 4.0" },
+      { "source": "NCBI taxdump", "license": "see NCBI terms" }
+    ],
+    "note": "Near-match (parahomonym) scan corpus. This is a tiny manual seed for tests/demos only; the full three-source corpus build is the M2 deliverable. The corpus date is always reported with results; a stale corpus is flagged corpus_stale."
+  },
+  "names": [
+    { "name": "Wukomonas beijingensis", "source": "synthetic-demo" },
+    { "name": "Wukomonas beijingense", "source": "synthetic-demo" },
+    { "name": "Escherichia coli", "source": "LPSN" },
+    { "name": "Shigella boydii", "source": "LPSN" },
+    { "name": "Klebsiella michiganensis", "source": "LPSN" },
+    { "name": "Rhizobium mongolense", "source": "LPSN" },
+    { "name": "Bacillus subtilis", "source": "LPSN" },
+    { "name": "Thermus thermophilus", "source": "LPSN" },
+    { "name": "Pseudonocardia autotrophica", "source": "LPSN" },
+    { "name": "Streptomyces autotrophicus", "source": "LPSN" },
+    { "name": "Vibrio cholerae", "source": "LPSN" },
+    { "name": "Oenococcus kitaharae", "source": "LPSN" },
+    { "name": "Lactobacillus delbrueckii", "source": "LPSN" },
+    { "name": "Bacillus subtilis subsp. spizizenii", "source": "LPSN" },
+    { "name": "Haloferax volcanii", "source": "SeqCode Registry" },
+    { "name": "Candidatus Pelagibacter ubique", "source": "NCBI" }
+  ]
+}

@@ -1,0 +1,218 @@
+{
+  "_meta": {
+    "version": "0.1.1-m10-contract",
+    "suite": "D-set (dual-code routing)",
+    "note": "v0.1 seed. Paper-grade D-set: ≥60 real cases stratified by type, including ≥20 ICNP-preemption cases (must be 100% correct). Full build is an M1 deliverable. For the ICNP-occupied cases the expected values encode 'The SeqCode recognises ICNP priority' is registration/curatorial practice, not an article of either code: the two codes are independent and each computes priority within itself, so route() must surface the ICNP conflict-guidance entry FIRST while keeping the SeqCode path visible and labelled, rather than hard-returning a single ICNP-only path. Changed expectations: the three is_icnp_preemption cases moved from [\"ICNP\"] to [\"ICNP\", \"SeqCode\"] (both role conflict-guidance), and the two unknown-source cases from [] to the router's needs-source gate entry ([\"unknown\"], plus [\"unknown\", \"ICNP\", \"SeqCode\"] when icnp_occupied is true). The lists are positional (path i is expected_codes[i] + expected_roles[i]) and ICNP-guidance-first, matching the order router.py guarantees; evaluator.evaluate_d_set() still compares them as sets, so tests/test_d_set_contract.py is what pins the order and the pairing. IMPORTANT: the pre-emption advice itself remains PENDING EXPERT SIGN-OFF on its wording (see routing/router.py::PREEMPTION_PROVENANCE ) — these values record the two-path routing contract, not a settled legal ruling. The per-case note 'ICNP pre-emption: must NOT route to SeqCode' on the first preemption case is wording kept verbatim for annotation provenance; it describes the warning that must always be present, not a bar that hides the SeqCode path.",
+    "target_sizes": {
+      "total": "≥60",
+      "icnp_preemption": "≥20 (must be 100% correct)"
+    },
+    "license": "CC0",
+    "case_count": 11,
+    "expanded": "2026-09-04: +3 curated cases (annotator=curated-seed)"
+  },
+  "cases": [
+    {
+      "source_label": "pure_culture",
+      "candidatus": false,
+      "icnp_occupied": false,
+      "expected_codes": [
+        "ICNP",
+        "SeqCode"
+      ],
+      "expected_roles": [
+        "default",
+        "alternative"
+      ],
+      "source": "synthetic",
+      "lpsn_id": null,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC0",
+      "grammatical_category": "routing"
+    },
+    {
+      "source_label": "MAG",
+      "candidatus": false,
+      "icnp_occupied": false,
+      "expected_codes": [
+        "SeqCode"
+      ],
+      "expected_roles": [
+        "only-viable"
+      ],
+      "source": "synthetic",
+      "lpsn_id": null,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC0",
+      "grammatical_category": "routing"
+    },
+    {
+      "source_label": "SAG",
+      "candidatus": false,
+      "icnp_occupied": false,
+      "expected_codes": [
+        "SeqCode"
+      ],
+      "expected_roles": [
+        "only-viable"
+      ],
+      "source": "synthetic",
+      "lpsn_id": null,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC0",
+      "grammatical_category": "routing"
+    },
+    {
+      "source_label": "MAG",
+      "candidatus": true,
+      "icnp_occupied": false,
+      "expected_codes": [
+        "SeqCode"
+      ],
+      "expected_roles": [
+        "only-viable"
+      ],
+      "source": "synthetic",
+      "lpsn_id": null,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC0",
+      "grammatical_category": "routing"
+    },
+    {
+      "source_label": "MAG",
+      "candidatus": false,
+      "icnp_occupied": true,
+      "expected_codes": [
+        "ICNP",
+        "SeqCode"
+      ],
+      "expected_roles": [
+        "conflict-guidance",
+        "conflict-guidance"
+      ],
+      "is_icnp_preemption": true,
+      "source": "synthetic",
+      "lpsn_id": null,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC0",
+      "grammatical_category": "routing",
+      "note": "ICNP pre-emption: must NOT route to SeqCode"
+    },
+    {
+      "source_label": "SAG",
+      "candidatus": false,
+      "icnp_occupied": true,
+      "expected_codes": [
+        "ICNP",
+        "SeqCode"
+      ],
+      "expected_roles": [
+        "conflict-guidance",
+        "conflict-guidance"
+      ],
+      "is_icnp_preemption": true,
+      "source": "synthetic",
+      "lpsn_id": null,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC0",
+      "grammatical_category": "routing"
+    },
+    {
+      "source_label": "pure_culture",
+      "candidatus": false,
+      "icnp_occupied": true,
+      "expected_codes": [
+        "ICNP",
+        "SeqCode"
+      ],
+      "expected_roles": [
+        "conflict-guidance",
+        "conflict-guidance"
+      ],
+      "is_icnp_preemption": true,
+      "source": "synthetic",
+      "lpsn_id": null,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC0",
+      "grammatical_category": "routing"
+    },
+    {
+      "source_label": "unknown",
+      "candidatus": false,
+      "icnp_occupied": false,
+      "expected_codes": [
+        "unknown"
+      ],
+      "expected_roles": [
+        "needs-source"
+      ],
+      "source": "synthetic",
+      "lpsn_id": null,
+      "annotator": "seed",
+      "annotated_at": "2026-08-16",
+      "license": "CC0",
+      "grammatical_category": "routing",
+      "note": "unknown source: should ask for clarification"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC0",
+      "source_label": "pure_culture",
+      "candidatus": true,
+      "icnp_occupied": false,
+      "expected_codes": [
+        "SeqCode"
+      ],
+      "expected_roles": [
+        "only-viable"
+      ],
+      "note": "Candidatus formatting forces the SeqCode channel even for cultured organisms"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC0",
+      "source_label": "SAG",
+      "candidatus": true,
+      "icnp_occupied": false,
+      "expected_codes": [
+        "SeqCode"
+      ],
+      "expected_roles": [
+        "only-viable"
+      ],
+      "note": "SAG + Candidatus → SeqCode only-viable"
+    },
+    {
+      "source": "lpsn-taxonomic-literature",
+      "annotator": "curated-seed",
+      "annotated_at": "2026-09-04",
+      "license": "CC0",
+      "source_label": "unknown",
+      "candidatus": false,
+      "icnp_occupied": true,
+      "expected_codes": [
+        "unknown",
+        "ICNP",
+        "SeqCode"
+      ],
+      "expected_roles": [
+        "needs-source",
+        "conflict-guidance",
+        "conflict-guidance"
+      ],
+      "is_icnp_preemption": false,
+      "note": "ask-for-source-first: routing is deferred until the data source is known"
+    }
+  ]
+}

@@ -1,0 +1,236 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  schedule:
+    # Weekly live smoke test: every Monday at 06:00 UTC
+    - cron: '0 6 * * 1'
+
+jobs:
+  lint:
+    name: Lint (ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install ruff
+        run: python -m pip install ruff
+
+      - name: Install package
+        # The doc-count step below measures with `pytest --collect-only`, so this
+        # job needs the same environment the test job measures in. Installing only
+        # ruff made the step die with "No module named pytest" and the check it
+        # exists to perform never happened.
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Ruff check
+        run: ruff check src scripts tests conftest.py
+
+      - name: Documentation test counts are filled in
+        # The docs quote a test count. It used to differ by environment (the
+        # Studio modules were PySide6-gated); Studio is a separate project now,
+        # so there is one number. It carries a generated figure rather than a
+        # hand-typed one that quietly goes stale — this step fails if a
+        # placeholder survives into a commit, or if a written number does not
+        # match what the suite collects today.
+        run: python scripts/fill_test_counts.py --verify
+
+  test:
+    name: Test (${{ matrix.os }} / Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.11', '3.12', '3.13', '3.14']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run unit + property tests (with coverage)
+        # bash: the backslash continuations below are not PowerShell syntax, and
+        # this job runs on windows-latest too, where the default shell would fail
+        # the step before pytest started.
+        shell: bash
+        # --cov-fail-under is the floor, not the measurement: the suite runs at
+        # 90% line coverage (2026-09-25), and the number below exists so a drop
+        # that removes tests (or adds untested branches) fails the run instead
+        # of being admired in the term-missing report. Raise it when it stops
+        # binding.
+        run: |
+          python -m pytest -v --tb=short \
+            --cov=prokname --cov-report=term-missing --cov-report=xml \
+            --cov-fail-under=85
+
+      - name: Run engine regression bench
+        run: prokname bench
+
+      - name: Run full benchmark suite (seed, gated)
+        # Blocks on real violations only: holdout leakage, a missed B1
+        # violation, an engine crash, D-set preemption errors. Evidence debt
+        # (`b1_fnr` untestable with the shipped 26-case seed) is reported by the
+        # next step instead of turning every push red, which had made this job
+        # unable to signal an actual regression.
+        run: prokname bench --full --json
+
+      - name: M1 evidence debt (informational, must stay visible)
+        # `--require-complete` is milestone mode and currently fails: the B1
+        # miss-rate target needs >=299 expert-labelled negative cases per
+        # etymology_type branch, and the seed set has 0 for `feature`/`thing`.
+        # continue-on-error keeps the fact on the run page without pretending
+        # the code is at fault. Run this flag locally before any M-review —
+        # an untested gate is never a certified one.
+        continue-on-error: true
+        run: |
+          if prokname bench --full --no-output --require-complete; then
+            echo "every gate target is testable with the shipped data."
+          else
+            echo "::warning title=M1 evidence debt::bench --require-complete failed: a gate target is untestable with the shipped seed (add expert-labelled B1 negatives, >=299 per etymology_type branch) or a real violation appeared. Read the output above - a genuine violation must block the merge."
+            exit 1
+          fi
+
+      - name: Run holdout integrity check (blocking)
+        run: prokname holdout
+
+      - name: Run M0 example verification
+        run: python scripts/verify_examples.py
+
+  wheel-smoke:
+    name: Wheel build + install smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Build wheel
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build --wheel
+
+      - name: Install wheel into a clean venv and smoke-test
+        run: |
+          python -m venv /tmp/prokname-smoke
+          /tmp/prokname-smoke/bin/pip install --upgrade pip
+          /tmp/prokname-smoke/bin/pip install dist/*.whl
+          # editable installs can hide missing package data; the wheel must
+          # ship every JSON asset for `data`/`bench --full` to work
+          /tmp/prokname-smoke/bin/prokname data --json
+          /tmp/prokname-smoke/bin/prokname bench --full --json > /dev/null
+          /tmp/prokname-smoke/bin/prokname gen --stem Boyd --type person \
+            --rank species --genus Shigella --person-gender male --json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheel
+          path: dist/*.whl
+
+  live-smoke:
+    name: Live smoke test (weekly, drift-detecting)
+    # Runs ONLY on the weekly schedule — never on push or pull_request, so
+    # ordinary PRs stay unaffected by upstream API etiquette or flakiness.
+    # This is the one test that can falsify the pinned LPSN/GNA contract
+    # assumptions, so unlike the old "failures are warnings only" job it MUST
+    # be allowed to go red: job-level continue-on-error and
+    # the per-command `|| true` are intentionally gone from this path.
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install package
+        # `.[online]` is not optional here. The whole job exists to prove the
+        # live adapters still answer the way the pinned contracts say, and
+        # without httpx / lpsn / keyring they degrade to 'unavailable' — which
+        # yields exit 3, which this job then reports as contract drift in the
+        # upstream service when the real cause is a missing extra. Installed
+        # .[dev] only until 2026-09-25, so the scheduled run could not pass.
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,online]"
+
+      - name: SeqCode endpoint contract check (drift fails the run)
+        # SeqCode rules from data/seqcode_registered.json, not from the wire,
+        # so this job would stay green forever if upstream changed shape. This
+        # is the one check that keeps that snapshot honest.
+        run: python scripts/probe_seqcode_api.py
+
+      - name: Upstream citation drift check (docs/provenance)
+        # `docs/provenance/upstream-references.md` replaced code comments that
+        # pointed at paths outside the repository. A provenance file nobody
+        # re-verifies rots the same way, so the pins it quotes are re-fetched
+        # here: a moved branch, a rewritten line, or a 404 fails this job.
+        # Schedule-only by design — a transient upstream outage must not turn
+        # an unrelated pull request red.
+        run: python scripts/check_upstream_citations.py
+
+      # Exit-code contract of `prokname check` (src/prokname/cli.py + the
+      # adjudicate() ordering in dedup/orchestrator.py):
+      #   0 = no conflict   1 = runtime error   2 = usage/argument error
+      #   3 = BLOCKED  — an authority was unreachable OR its answer could not
+      #                  be ruled on (unavailable / found_unknown; a plain
+      #                  not_found never blocks — it is a ruling)
+      #   4 = CONFLICT — an authority holds the name as occupied
+      # "Escherichia coli" and "Bacillus subtilis" are validly published,
+      # correct LPSN names, so a HEALTHY upstream MUST answer exit 4 for both.
+      # Anything else falsifies the pinned contract and turns this job red:
+      #   exit 3 — upstream unreachable / credentials or endpoint changed, OR
+      #            a pinned record field was renamed (full_name -> name_string),
+      #            so LPSN's identity guard no longer matches and a known name
+      #            degrades to not_found — the exact silent-drift mode this job
+      #            exists to catch (the always-unavailable, M0-gated SeqCode
+      #            adapter turns that into BLOCKED rather than a false clean
+      #            verdict);
+      #   exit 0/1/2 — an authority unexpectedly cleared a published name, or
+      #            the CLI itself regressed.
+      # A red scheduled run therefore means: re-check the LPSN/GNA adapters and
+      # the tests/fixtures/ contract pins before trusting any online result.
+      - name: Live smoke (LPSN/SeqCode/GNA — drift fails the scheduled run)
+        env:
+          PROKNAME_LPSN_USER: ${{ secrets.LPSN_USER }}
+          PROKNAME_LPSN_PASSWORD: ${{ secrets.LPSN_PASSWORD }}
+        run: |
+          overall=0
+          for name in "Escherichia coli" "Bacillus subtilis"; do
+            echo "::group::live smoke — $name"
+            set +e
+            prokname check "$name" --online
+            rc=$?
+            set -e
+            echo "exit code: $rc"
+            echo "::endgroup::"
+            if [ "$rc" -ne 4 ]; then
+              echo "::error::upstream contract drift for \"$name\": a published name must resolve to CONFLICT (exit 4); got exit $rc — 3 means upstream is unreachable or a pinned field/label rename degraded the identity guard, any other code is a CLI regression. Re-check the LPSN/GNA adapters and tests/fixtures/ contract pins."
+              overall=1
+            fi
+          done
+          exit "$overall"

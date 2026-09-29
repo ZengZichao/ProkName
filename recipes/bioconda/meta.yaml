@@ -1,0 +1,66 @@
+{% set name = "prokname" %}
+# Version: the single source of truth is the `__version__`
+# literal in src/prokname/__init__.py, which pyproject.toml consumes
+# dynamically. conda-build renders this Jinja template *before* the package
+# exists in the build environment (it needs the version to fetch the source),
+# so the recipe has to keep its own literal. It is one of the mirrors checked
+# by tests/test_version_consistency.py; bump it together with the release.
+{% set version = "0.1.0" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  # In production, replace with the GitHub release archive URL + hash.
+  # For local testing: conda build uses the local sdist.
+  path: ../..
+
+build:
+  noarch: python
+  number: 0
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  entry_points:
+    - prokname = prokname.cli:main
+
+requirements:
+  host:
+    - python >=3.11
+    - hatchling
+    - pip
+  run:
+    - python >=3.11
+    - typer >=0.12,<1.0
+    - rich >=13.0,<15.0
+
+test:
+  imports:
+    - prokname
+    - prokname.engine
+    - prokname.routing
+    - prokname.dedup
+    - prokname.benchmark
+    - prokname.storage
+  commands:
+    - prokname --version
+    - prokname gen --stem Boyd --type person --rank species --genus Shigella --person-gender male
+
+about:
+  home: "https://github.com/ZengZichao/ProkName"
+  license: MIT
+  license_file: LICENSE
+  summary: "Prokaryotic nomenclature assistant: deterministic etymology-driven name generation, gender agreement validation, dual-code (ICNP/SeqCode) routing"
+  description: |
+    prokname is a command-line tool and Python library for assisting
+    researchers in naming new prokaryotic taxa (bacteria and archaea) under
+    the International Code of Nomenclature of Prokaryotes (ICNP) and the
+    SeqCode. It provides deterministic, rule-based generation of candidate
+    names from etymology inputs, dual-mode genus gender determination,
+    grammatical agreement validation, dual-code routing with ICNP-preemption
+    awareness, and two-tier deduplication.
+  doc_url: "https://github.com/ZengZichao/ProkName#readme"
+  dev_url: "https://github.com/ZengZichao/ProkName"
+
+extra:
+  recipe-maintainers:
+    - zengzichao

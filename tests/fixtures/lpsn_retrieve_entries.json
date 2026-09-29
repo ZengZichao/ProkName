@@ -1,0 +1,42 @@
+{
+  "_provenance": {
+    "kind": "source-derived fixture — NOT a live capture",
+    "derived_from": "lpsn-api (LeibnizDSMZ/lpsn-api, vendored read-only snapshot @ c15229e7, PyPI package version 1.0.0)",
+    "derived_from_lines": [
+      "lpsn-api/README.md:81-96 — documented shape of `client.retrieve(filter=[\"full_name\", \"lpsn_taxonomic_status\"])`, which yields one entry per LPSN id: {id: [{'full_name': 'Sulfolobus acidocaldarius'}, {'lpsn_taxonomic_status': 'correct name'}]}",
+      "lpsn-api/lpsn/client.py:139-154 — retrieve() without a filter yields the FULL entries as dicts (this fixture uses that unfiltered form, which is what dedup/lpsn.py consumes)",
+      "lpsn-api/lpsn/client.py:185-194 — a successful search leaves self.result with 'count'/'next'/'results'; 'count': 0 is printed as 'Your search did not receive any results.'"
+    ],
+    "live_capture": false,
+    "as_of": "2026-09-21",
+    "note": "(tests/fixtures/ empty → adapter contract unpinned)",
+    "contract_pinned_by": [
+      "record key 'full_name' must hold the bare name WITHOUT the author citation (lpsn-api/README.md:88-96 shows 'Sulfolobus acidocaldarius')",
+      "record key 'lpsn_taxonomic_status' must be a string label",
+      "client.result['count'] == 0 must distinguish 'genuine zero results' from 'query rejected'"
+    ]
+  },
+  "search_state": {
+    "count": 3,
+    "next": null,
+    "previous": null,
+    "results": [782310, 782311, 782312]
+  },
+  "entries": [
+    {
+      "id": 782310,
+      "full_name": "Sulfolobus acidocaldarius",
+      "lpsn_taxonomic_status": "correct name"
+    },
+    {
+      "id": 782311,
+      "full_name": "Sulfolobus brierleyi",
+      "lpsn_taxonomic_status": "synonym"
+    },
+    {
+      "id": 782312,
+      "full_name": "Sulfolobus hakonensis",
+      "lpsn_taxonomic_status": "synonym"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+cff-version: 1.2.0
+message: "If you use prokname in your research, please cite it as follows."
+# Version: the single source of truth is the `__version__`
+# literal in src/prokname/__init__.py. CFF is plain YAML — it cannot read that
+# file — so the two `version:` fields below (this record and
+# `preferred-citation`) are mirrors kept honest by
+# tests/test_version_consistency.py, which fails if they drift.
+title: "prokname: a deterministic, auditable decision-support tool for prokaryotic nomenclature under the ICNP and SeqCode"
+authors:
+  - family-names: "Zeng"
+    given-names: "Zichao"
+    orcid: "https://orcid.org/0000-0001-6553-970X"
+type: software
+version: 0.1.0
+date-released: "2026-09-29"
+license: MIT
+license-url: "https://opensource.org/licenses/MIT"
+repository-code: "https://github.com/ZengZichao/ProkName"
+keywords:
+  - nomenclature
+  - taxonomy
+  - ICNP
+  - SeqCode
+  - LPSN
+  - prokaryotes
+  - bioinformatics
+abstract: >-
+  prokname is a command-line tool and Python library for assisting
+  researchers in naming new prokaryotic taxa (bacteria and archaea) under
+  the International Code of Nomenclature of Prokaryotes (ICNP) and the
+  SeqCode. It provides deterministic, rule-based generation of candidate
+  names from etymology inputs, dual-mode genus gender determination,
+  grammatical agreement validation (three-way categories: true adjective,
+  genitive noun, appositive noun), dual-code routing (ICNP vs SeqCode with
+  ICNP-preemption awareness), and two-tier deduplication (authority APIs +
+  local parahomonym scan). The tool is designed for reproducibility and
+  auditability: all rules are versioned JSON data assets, no large language
+  models are used in the core pipeline, and every output carries source
+  attribution and license information.
+preferred-citation:
+  type: software
+  title: "prokname: prokaryotic nomenclature assistant"
+  authors:
+    - family-names: "Zeng"
+      given-names: "Zichao"
+      orcid: "https://orcid.org/0000-0001-6553-970X"
+  # Second mirror of the single source of truth — keep equal to the
+  # `version:` above; tests/test_version_consistency.py enforces both.
+  version: 0.1.0
+  date-released: "2026-09-29"
+  license: MIT
+  repository-code: "https://github.com/ZengZichao/ProkName"

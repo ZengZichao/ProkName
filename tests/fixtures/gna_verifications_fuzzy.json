@@ -1,0 +1,91 @@
+{
+  "_provenance": {
+    "kind": "constructed near-match payload — NOT a live capture",
+    "derived_from": [
+      "field names / nesting: gnverifier/pkg/io/verifrest/fixtures/names.yaml:15 (upstream-recorded)",
+      "fuzzy vocabulary and editDistance semantics: gnmatcher/internal/testdata/testdata.csv:1-5, whose columns are (name, matchType, matchedName, editDistance) — e.g. 'Raliella subelongata,FuzzyCanonicalMatch,Kaliella subelongata,1' and 'Chondrum crispum,FuzzyCanonicalMatch,Chondrus crispus,2': the service matched a DIFFERENT name at distance 1-2",
+      "why fuzzy must not occupy a name: gnverifier/fuzzy-matching.md:25-30 ('edit distances greater than 1 produce more false positives than accurate results')"
+    ],
+    "live_capture": false,
+    "as_of": "2026-09-21",
+    "recorded_for": "the GNA fuzzy-match contract: a near-match is a warning, never a ruling"
+  },
+  "cases": {
+    "fuzzy_canonical_match_other_name": {
+      "_note": "query 'Raliella subelongata' → GNA answers with the genus Kaliella name; nothing here says 'Raliella subelongata' is in use",
+      "metadata": { "namesNumber": 1 },
+      "names": [
+        {
+          "id": "b0c9a1d2-0000-5000-8000-000000000001",
+          "name": "Raliella subelongata",
+          "matchType": "Fuzzy",
+          "bestResult": {
+            "dataSourceId": 1,
+            "dataSourceTitleShort": "CoL",
+            "matchedName": "Kaliella subelongata",
+            "matchedCanonicalFull": "Kaliella subelongata",
+            "currentName": "Kaliella subelongata",
+            "isSynonym": false,
+            "editDistance": 1,
+            "stemEditDistance": 1,
+            "matchType": "FuzzyCanonicalMatch"
+          },
+          "results": []
+        }
+      ]
+    },
+    "exact_entry_fuzzy_best_result": {
+      "_note": "entry-level Exact but the best result is a partial/canonical match — the adapter must not assert occupancy unless BOTH levels are Exact and editDistance == 0",
+      "metadata": { "namesNumber": 1 },
+      "names": [
+        {
+          "id": "b0c9a1d2-0000-5000-8000-000000000002",
+          "name": "Escherichia coli",
+          "matchType": "Exact",
+          "bestResult": {
+            "dataSourceId": 4,
+            "dataSourceTitleShort": "NCBI",
+            "matchedName": "Escherichia coli subsp. K-12",
+            "currentName": "Escherichia coli",
+            "isSynonym": false,
+            "editDistance": 9,
+            "matchType": "ExactPartialMatch"
+          },
+          "results": []
+        }
+      ]
+    },
+    "exact_but_missing_edit_distance": {
+      "_note": "service dropped the editDistance field: the old code printed 'edit distance: )'; the adapter must render n/a and still refuse an Exact-based occupancy claim it cannot corroborate",
+      "metadata": { "namesNumber": 1 },
+      "names": [
+        {
+          "id": "b0c9a1d2-0000-5000-8000-000000000003",
+          "name": "Escherichia coli",
+          "matchType": "Exact",
+          "bestResult": {
+            "dataSourceId": 4,
+            "dataSourceTitleShort": "NCBI",
+            "matchedName": "Escherichia coli",
+            "currentName": "Escherichia coli",
+            "isSynonym": false,
+            "matchType": "Exact"
+          },
+          "results": []
+        }
+      ]
+    },
+    "no_match_entry_without_best_result": {
+      "_note": "verbatim behaviour from names.yaml:15 — a 'NoMatch' name carries matchType and nothing else",
+      "metadata": { "namesNumber": 1 },
+      "names": [
+        {
+          "id": "045a466e-1aba-5024-ad4e-fe9d3bf21fa2",
+          "name": "Notanorganism nowherei",
+          "matchType": "NoMatch",
+          "curation": "NotCurated"
+        }
+      ]
+    }
+  }
+}

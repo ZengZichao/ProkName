@@ -1,0 +1,25 @@
+{
+  "_provenance": {
+    "kind": "source-derived fixture — NOT a live capture",
+    "derived_from": "lpsn-api/lpsn/client.py:156-194 (LeibnizDSMZ/lpsn-api @ c15229e7)",
+    "why": "search() returns 0 BOTH for a genuine zero-hit query AND for a rejected query; the two are told apart only by inspecting client.result afterwards. dedup/lpsn.py depends on that distinction, so both payloads are pinned here.",
+    "live_capture": false,
+    "as_of": "2026-09-21"
+  },
+  "genuine_zero_results": {
+    "_note": "client.py:190-192 — count present and 0 → 'Your search did not receive any results.'",
+    "count": 0,
+    "next": null,
+    "previous": null,
+    "results": []
+  },
+  "query_rejected": {
+    "_note": "client.py:185-188 — no 'count' key, error title/message instead → 'ERROR: <title> <message>' printed, search() returns 0",
+    "title": "Bad Request",
+    "message": "invalid filter parameter"
+  },
+  "auth_expired_401": {
+    "_note": "client.py:88-99 — a 401 whose message is 'Expired token' is refreshed and retried inside the client; any other 401 payload is returned as the result dict",
+    "message": "Expired token"
+  }
+}

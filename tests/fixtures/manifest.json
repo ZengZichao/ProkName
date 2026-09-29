@@ -1,0 +1,93 @@
+{
+  "_purpose": "Inventory + provenance for every file in tests/fixtures/. The repository carries evidence for every pinned adapter contract; the honest limit of that evidence is recorded per file, so no test may claim 'recorded from the live service' unless live_capture is true.",
+  "as_of": "2026-09-25",
+  "vendored_snapshot_root": " (read-only local mirror of the upstream projects, downloaded 2026-09-07; convenience for offline reading, not an authority)",
+    "citation_register": "docs/provenance/upstream-references.md — the in-repo register of what each upstream source says, pinned by commit and re-checkable with scripts/check_upstream_citations.py",
+  "live_capture_policy": "exactly one fixture here is a genuine capture from a live service: gna_verifications_live.json, recorded by scripts/record_live_gna.py and re-checkable with `--check`. Everything else is source-derived or synthetic and says so. A fixture may only be marked live_capture true if the recording tool, endpoint and timestamp are recorded in its own _provenance and re-derivable by anyone without credentials.",
+  "outstanding_live_captures": [
+    "lpsn_advanced_search_live.json — needs LPSN credentials (PROKNAME_LPSN_USER/PASSWORD); record via the scheduled CI live-smoke job",
+    "lpsn_status_live.json — the label enumeration above cross-checked against a live response; required before any 'verified: false' row in src/prokname/data/lpsn_status.json may be flipped to true",
+    "seqcode_registry_live.json — the SeqCode REST contract; see dedup/seqcode.py m0_flip_checklist()"
+  ],
+  "completed_live_captures": [
+    "gna_verifications_live.json — recorded 2026-09-25 from the live GNverifier service; closes the M2 'confirm one live response still matches this schema' gate in src/prokname/dedup/gna.py"
+  ],
+  "files": {
+    "lpsn_retrieve_entries.json": {
+      "kind": "source-derived (unfiltered client.retrieve() output)",
+      "derived_from": "lpsn-api/README.md:81-96 + lpsn/client.py:139-154 (LeibnizDSMZ/lpsn-api @ c15229e7)",
+      "live_capture": false,
+      "pins": [
+        "record field 'full_name' (bare name, no author citation)",
+        "record field 'lpsn_taxonomic_status' (string label)",
+        "records carry an 'id' key"
+      ],
+      "consumed_by": "tests/test_online_adapters.py"
+    },
+    "lpsn_search_states.json": {
+      "kind": "source-derived (client search-state disambiguation)",
+      "derived_from": "lpsn-api/lpsn/client.py:185-194",
+      "live_capture": false,
+      "pins": [
+        "count == 0 with a 'count' key in client.result ⇒ genuine not_found",
+        "payload without 'count' ⇒ rejected query ⇒ unavailable, never not_found"
+      ],
+      "consumed_by": "tests/test_online_adapters.py"
+    },
+    "lpsn_status_labels.json": {
+      "kind": "label enumeration (2 values vendored-verified, 10 unsourced)",
+      "derived_from": "lpsn-api/README.md:88-96 + the LPSN status vocabulary",
+      "live_capture": false,
+      "pins": [
+        "every label must appear in src/prokname/data/lpsn_status.json",
+        "every label must classify to a non-'unknown' category, and the two negated 'not/non-validly published' labels must NOT read as valid"
+      ],
+      "consumed_by": "tests/test_online_adapters.py"
+    },
+    "gna_verifications_exact.json": {
+      "kind": "trimmed copy of an upstream-recorded HTTP fixture",
+      "derived_from": "gnverifier/pkg/io/verifrest/fixtures/names.yaml:15 (gnames/gnverifier @ f73968c1, upstream recording dated 2021-12-06)",
+      "live_capture": false,
+      "pins": [
+        "POST body keys nameStrings/withAllMatches/withVernaculars",
+        "entry.matchType + bestResult.matchType + editDistance co-occurrence on an Exact hit"
+      ],
+      "consumed_by": "tests/test_online_adapters.py, tests/test_api_fixtures.py"
+    },
+    "gna_verifications_fuzzy.json": {
+      "kind": "constructed schema-conformant payloads",
+      "derived_from": "gnverifier names.yaml:15 (field names) + gnmatcher/internal/testdata/testdata.csv:1-5 (Fuzzy* vocabulary, editDistance) + gnverifier/fuzzy-matching.md:25-30",
+      "live_capture": false,
+      "pins": [
+        "a fuzzy hit must never be reported as occupancy (found_near_match)",
+        "a missing editDistance must render as 'n/a', not as an empty placeholder"
+      ],
+      "consumed_by": "tests/test_online_adapters.py"
+    },
+    "gna_verifications_live.json": {
+      "kind": "live capture (untrimmed responses from the running GNverifier service)",
+      "derived_from": "POST https://verifier.globalnames.org/api/v1/verifications, recorded 2026-09-25 by scripts/record_live_gna.py with the same body the adapter sends (withAllMatches false)",
+      "live_capture": true,
+      "pins": [
+        "an Exact entry with an Exact bestResult and editDistance 0 rules as found_reference, not not_found",
+        "the service really does emit the entry-level matchType words Exact / Fuzzy / NoMatch (the vendored names.yaml sample only carried Exact and NoMatch)",
+        "a Fuzzy bestResult rules as found_near_match and is never read as occupancy (that finding)",
+        "a NoMatch entry carries no bestResult at all, which is what makes 'not found' distinguishable from 'could not ask'",
+        "the field names gna.check() reads (matchType, bestResult.matchType, bestResult.editDistance, matchedName, currentName, dataSourceTitleShort, isSynonym) still exist upstream"
+      ],
+      "consumed_by": "tests/test_api_fixtures.py",
+      "recheck": "python scripts/record_live_gna.py --check"
+    },
+    "ncbi_names_tiny.dmp": {
+      "kind": "synthetic names.dmp sample (no real NCBI rows)",
+      "derived_from": "field layout from src/prokname/dedup/ncbi.py docstring and scripts/rebuild_corpus.py:344-361; name_class VALUE LIST from the NCBI taxdump README (NOT vendored — hence the semantics table in dedup/ncbi.py marks every row verified: false)",
+      "live_capture": false,
+      "pins": [
+        "'authority' is a citation, not a synonym",
+        "'misspelling' is the parahomonym signal",
+        "multiple rows for one name merge by name_class PRIORITY, not file order"
+      ],
+      "consumed_by": "tests/test_api_fixtures.py"
+    }
+  }
+}

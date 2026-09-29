@@ -1,0 +1,313 @@
+{
+  "_meta": {
+    "version": "0.2.0-m0",
+    "asset_kind": "type-genus declension-stem lexicon for higher-rank name derivation",
+    "status": "M0 draft. Names of suprageneric taxa are formed from the GENITIVE (declension) STEM of the type-genus name, never from the nominative. Only entries individually flagged verified:true may be used to assert compliance; every emitted name additionally has to appear in 'attested_higher_rank_names' with verified:true, otherwise the engine returns needs_review / compliant=None.",
+    "provenance": [
+      "ICNP (2022), rules on names of suprageneric taxa: family and order names are formed from the stem of the name of the type genus plus the termination -aceae / -ales (exact article numbers are NOT re-verified here — see rule_citation_status).",
+      "SeqCode curation guide (local snapshot seqcode-documentation/guide/curation.md:158-165): 'Confirm that the correct rank ... families should end in the suffix -aceae, orders ... -ales, classes ... -ia, phyla ... -ota.' and step 2: 'Check that the name is formed from the inferred stem of the type genus name.'",
+      "LPSN (lpsn.dsmz.de) published family/order/class/phylum names, cited per entry as the anchor that attests the stem."
+    ],
+    "rule_citation_status": "verified: false — the ICNP article/rule numbers behind -aceae/-ales/-ota/-ia were not checked against the code text in this repository. The suffix FORMS are cross-checked against LPSN usage (the LPSN status label vocabulary; the stem-derivation requirement is cross-checked against the SeqCode curation guide quoted above.",
+    "how_to_extend": "Add the genus to 'genera' with the stem that the PUBLISHED higher-rank name actually uses (that is the only machine-checkable evidence), the anchor name and its source. Never add a stem inferred from memory: leave the genus out so the documented 'fallback_rules' apply, which are flagged needs_review by design.",
+    "composition_note": "suffix composition (engine/generate.py::_compose_higher_rank): stem + suffix, with Latin vowel coalescence: a stem ending in -i followed by a suffix beginning with i loses the suffix's i (clostridi + ia -> Clostridia, corynebacteri + ineae -> Corynebacterineae, acidimicrobi + idae -> Acidimicrobidae). Attested by those three published names."
+  },
+  "genera": {
+    "Bacillus": {
+      "stem": "bacill",
+      "declension": "2nd, -us (m)",
+      "genitive": "Bacilli",
+      "verified": true,
+      "source": "LPSN: Bacillaceae, Bacillales, Bacillota; class Bacilli (protected name)"
+    },
+    "Streptomyces": {
+      "stem": "streptomycet",
+      "declension": "3rd, -es (gen. -etis, m)",
+      "genitive": "Streptomycetis",
+      "verified": true,
+      "source": "LPSN: Streptomycetaceae, Streptomycetales; subtribe Streptomycinae"
+    },
+    "Pseudomonas": {
+      "stem": "pseudomonad",
+      "declension": "3rd, -as (gen. -adis, f)",
+      "genitive": "Pseudomonadis",
+      "verified": true,
+      "source": "LPSN: Pseudomonadaceae, Pseudomonadales, Pseudomonadota"
+    },
+    "Vibrio": {
+      "stem": "vibrion",
+      "declension": "2nd, -o (m, gen. -onis)",
+      "genitive": "Vibrionis",
+      "verified": true,
+      "source": "LPSN: Vibrionaceae, Vibrionales"
+    },
+    "Clostridium": {
+      "stem": "clostridi",
+      "declension": "2nd, -um (n, -ium)",
+      "genitive": "Clostridii",
+      "verified": true,
+      "source": "LPSN: Clostridiaceae, Clostridiales, Clostridia"
+    },
+    "Mycobacterium": {
+      "stem": "mycobacteri",
+      "declension": "2nd, -um (n, -ium)",
+      "genitive": "Mycobacterii",
+      "verified": true,
+      "source": "LPSN: Mycobacteriaceae"
+    },
+    "Micrococcus": {
+      "stem": "micrococc",
+      "declension": "2nd, -us (m, Greek -kokkos)",
+      "genitive": "Micrococci",
+      "verified": true,
+      "source": "LPSN: Micrococcaceae, Micrococcales"
+    },
+    "Enterococcus": {
+      "stem": "enterococc",
+      "declension": "2nd, -us (m)",
+      "genitive": "Enterococci",
+      "verified": true,
+      "source": "LPSN: Enterococcaceae"
+    },
+    "Lactococcus": {
+      "stem": "lactococc",
+      "declension": "2nd, -us (m)",
+      "genitive": "Lactococci",
+      "verified": true,
+      "source": "LPSN: Lactococcaceae"
+    },
+    "Staphylococcus": {
+      "stem": "staphylococc",
+      "declension": "2nd, -us (m)",
+      "genitive": "Staphylococci",
+      "verified": true,
+      "source": "LPSN: Staphylococcaceae"
+    },
+    "Streptococcus": {
+      "stem": "streptococc",
+      "declension": "2nd, -us (m)",
+      "genitive": "Streptococci",
+      "verified": true,
+      "source": "LPSN: Streptococcaceae"
+    },
+    "Lactobacillus": {
+      "stem": "lactobacill",
+      "declension": "2nd, -us (m)",
+      "genitive": "Lactobacilli",
+      "verified": true,
+      "source": "LPSN: Lactobacillaceae, Lactobacillales; tribe Lactobacilleae"
+    },
+    "Rickettsia": {
+      "stem": "rickettsi",
+      "declension": "1st, -a (f)",
+      "genitive": "Rickettsiae",
+      "verified": true,
+      "source": "LPSN: Rickettsiaceae, Rickettsiales"
+    },
+    "Neisseria": {
+      "stem": "neisseri",
+      "declension": "1st, -a (f)",
+      "genitive": "Neisseriae",
+      "verified": true,
+      "source": "LPSN: Neisseriaceae"
+    },
+    "Deinococcus": {
+      "stem": "deinococc",
+      "declension": "2nd, -us (m)",
+      "genitive": "Deinococci",
+      "verified": true,
+      "source": "LPSN: family Deinococcaceae, order Deinococcales, phylum Deinococcota"
+    },
+    "Treponema": {
+      "stem": "treponemat",
+      "declension": "3rd, Greek -ma (n)",
+      "genitive": "Treponematis",
+      "verified": true,
+      "source": "LPSN: Treponemataceae (irregular: -ma stem is -mat, NOT the nominative minus -a)"
+    },
+    "Crenarchaeum": {
+      "stem": "crenarchae",
+      "declension": "2nd, -um (n)",
+      "genitive": "Crenarchaei",
+      "verified": true,
+      "source": "LPSN: Crenarchaeota (phylum), Crenarchaeales; family name derived stem keeps the Greek -o-"
+    },
+    "Acidimicrobium": {
+      "stem": "acidimicrobi",
+      "declension": "2nd, -um (n, -ium)",
+      "genitive": "Acidimicrobii",
+      "verified": true,
+      "source": "LPSN: Acidimicrobiaceae, subclass Acidimicrobidae, class Acidimicrobiia"
+    },
+    "Corynebacterium": {
+      "stem": "corynebacteri",
+      "declension": "2nd, -um (n, -ium)",
+      "genitive": "Corynebacterii",
+      "verified": true,
+      "source": "LPSN: Corynebacteriaceae, suborder Corynebacterineae"
+    },
+    "Bdellovibacter": {
+      "stem": "bdellovibrion",
+      "declension": "irregular (compound in -bacter, named after Vibrio)",
+      "genitive": null,
+      "verified": true,
+      "source": "LPSN: Bdellovibrionaceae — counter-example proving a mechanical '-er -> identity' rule is unsafe, hence the lexicon"
+    },
+    "Klebsiella": {
+      "stem": "klebsiell",
+      "declension": "1st, -a (f)",
+      "genitive": "Klebsiellae",
+      "verified": true,
+      "source": "LPSN: Klebsiellaceae (note: the family is NOT Enterobacteriaceae in current LPSN usage)"
+    },
+    "Escherichia": {
+      "stem": "escherichi",
+      "declension": "1st, -a (f)",
+      "genitive": "Escherichiae",
+      "verified": true,
+      "source": "LPSN: family of Escherichia is Enterobacteriaceae/Morganellaceae per current taxonomy — stem entry only, the TYPE GENUS of the family is a different genus (typification is not machine-checkable)"
+    },
+    "Methanobacterium": {
+      "stem": "methanobacteri",
+      "declension": "2nd, -um (n, -ium)",
+      "genitive": "Methanobacterii",
+      "verified": true,
+      "source": "LPSN: Methanobacteriaceae, Methanobacteriales, Methanobacteria"
+    }
+  },
+  "fallback_rules": [
+    {
+      "id": "greek_ma",
+      "nominative_ending": "ma",
+      "replacement": "mat",
+      "verified": true,
+      "anchor": "Treponema -> treponemat (Treponemataceae)",
+      "note": "Greek neuters in -ma have the genitive stem in -mat; dropping only -a (-> Treponemaceae) is a known error."
+    },
+    {
+      "id": "second_neuter_ium",
+      "nominative_ending": "um",
+      "replacement": "",
+      "verified": true,
+      "anchor": "Clostridium -> clostridi (Clostridiaceae), Mycobacterium -> mycobacteri (Mycobacteriaceae), Crenarchaeum -> crenarchae (Crenarchaeota)"
+    },
+    {
+      "id": "second_masculine_us",
+      "nominative_ending": "us",
+      "replacement": "",
+      "verified": true,
+      "anchor": "Bacillus -> bacill (Bacillaceae), Micrococcus -> micrococc (Micrococcaceae)"
+    },
+    {
+      "id": "third_es_genetis",
+      "nominative_ending": "es",
+      "replacement": "et",
+      "verified": true,
+      "anchor": "Streptomyces -> streptomycet (Streptomycetaceae)"
+    },
+    {
+      "id": "third_as_genadis",
+      "nominative_ending": "as",
+      "replacement": "ad",
+      "verified": true,
+      "anchor": "Pseudomonas -> pseudomonad (Pseudomonadaceae, Pseudomonadota)"
+    },
+    {
+      "id": "first_a",
+      "nominative_ending": "a",
+      "replacement": "",
+      "verified": true,
+      "anchor": "Rickettsia -> rickettsi (Rickettsiaceae), Neisseria -> neisseri (Neisseriaceae)"
+    },
+    {
+      "id": "second_o_genonis",
+      "nominative_ending": "o",
+      "replacement": "on",
+      "verified": true,
+      "anchor": "Vibrio -> vibrion (Vibrionaceae), Desulfovibrio -> desulfovibrion (Desulfovibrionaceae)"
+    },
+    {
+      "id": "third_on",
+      "nominative_ending": "on",
+      "replacement": "on",
+      "verified": false,
+      "anchor": "no LPSN instance inspected for this repository — pending M0 sign-off",
+      "note": "Greek -on genera usually have the genitive in -ontos (-ont- stem); the identity mapping below is deliberately unverified."
+    },
+    {
+      "id": "third_er",
+      "nominative_ending": "er",
+      "replacement": "er",
+      "verified": false,
+      "anchor": "Bdellovibacter is the counter-example (published family is Bdellovibrionaceae) — pending M0 sign-off",
+      "note": "identity mapping: some -er/-bacter genera take an irregular stem; never assert compliance from this rule."
+    },
+    {
+      "id": "third_is",
+      "nominative_ending": "is",
+      "replacement": "is",
+      "verified": false,
+      "anchor": "no LPSN instance inspected for this repository — pending M0 sign-off",
+      "note": "identity mapping for 3rd-declension -is genera (genitive -is/-inis)."
+    }
+  ],
+  "higher_rank_exceptions": {
+    "Bacillus": {
+      "class": {
+        "name": "Bacilli",
+        "verified": true,
+        "source": "ICNP protected/conserved class name; listed in rules.json conserved_names; SeqCode curation guide treats -ia as the recommendation, Bacilli as the historical exception",
+        "note": "The mechanical form 'Bacillia' is NOT a published name and must never be emitted (scripts/verify_examples.py 'NOT Bacillia')."
+      }
+    },
+    "Streptomyces": {
+      "subtribe": {
+        "name": "Streptomycinae",
+        "verified": false,
+        "source": "rules.json rank_suffix_examples (M0 anchored list) — NOT re-verified against LPSN inside this repository",
+        "note": "Tribal ranks are built on the 'Streptomyco-' stem (tribe Streptomyceae, subtribe Streptomycinae), NOT on the family stem 'Streptomycet-' (Streptomycetaceae). Mechanical composition would give 'Streptomycetinae', so this exception exists precisely because the regular rule cannot reproduce the anchored example (a machine check catches exactly this)."
+      }
+    }
+  },
+  "attested_higher_rank_names": [
+    { "name": "Bacillaceae", "rank": "family", "type_genus": "Bacillus", "verified": true, "source": "LPSN" },
+    { "name": "Bacillales", "rank": "order", "type_genus": "Bacillus", "verified": true, "source": "LPSN" },
+    { "name": "Bacillota", "rank": "phylum", "type_genus": "Bacillus", "verified": true, "source": "LPSN (replacement name for Firmicutes)" },
+    { "name": "Bacilli", "rank": "class", "type_genus": "Bacillus", "verified": true, "source": "ICNP protected class name (conserved_names)" },
+    { "name": "Bacilloideae", "rank": "subfamily", "type_genus": "Bacillus", "verified": true, "source": "LPSN" },
+    { "name": "Streptomycetaceae", "rank": "family", "type_genus": "Streptomyces", "verified": true, "source": "LPSN" },
+    { "name": "Streptomycetales", "rank": "order", "type_genus": "Streptomyces", "verified": true, "source": "LPSN" },
+    { "name": "Streptomycinae", "rank": "subtribe", "type_genus": "Streptomyces", "verified": false, "source": "rules.json M0 example list — irregular tribal stem, see higher_rank_exceptions; not re-verified against LPSN here" },
+    { "name": "Pseudomonadaceae", "rank": "family", "type_genus": "Pseudomonas", "verified": true, "source": "LPSN" },
+    { "name": "Pseudomonadales", "rank": "order", "type_genus": "Pseudomonas", "verified": true, "source": "LPSN" },
+    { "name": "Pseudomonadota", "rank": "phylum", "type_genus": "Pseudomonas", "verified": true, "source": "LPSN (replacement name for Proteobacteria)" },
+    { "name": "Vibrionaceae", "rank": "family", "type_genus": "Vibrio", "verified": true, "source": "LPSN" },
+    { "name": "Vibrionales", "rank": "order", "type_genus": "Vibrio", "verified": true, "source": "LPSN" },
+    { "name": "Clostridiaceae", "rank": "family", "type_genus": "Clostridium", "verified": true, "source": "LPSN" },
+    { "name": "Clostridiales", "rank": "order", "type_genus": "Clostridium", "verified": true, "source": "LPSN; this is the name the USAGE example must show (NOT 'Closterales')" },
+    { "name": "Clostridia", "rank": "class", "type_genus": "Clostridium", "verified": true, "source": "LPSN" },
+    { "name": "Mycobacteriaceae", "rank": "family", "type_genus": "Mycobacterium", "verified": true, "source": "LPSN" },
+    { "name": "Micrococcaceae", "rank": "family", "type_genus": "Micrococcus", "verified": true, "source": "LPSN" },
+    { "name": "Micrococcales", "rank": "order", "type_genus": "Micrococcus", "verified": true, "source": "LPSN" },
+    { "name": "Enterococcaceae", "rank": "family", "type_genus": "Enterococcus", "verified": true, "source": "LPSN" },
+    { "name": "Lactococcaceae", "rank": "family", "type_genus": "Lactococcus", "verified": true, "source": "LPSN" },
+    { "name": "Staphylococcaceae", "rank": "family", "type_genus": "Staphylococcus", "verified": true, "source": "LPSN" },
+    { "name": "Lactobacillaceae", "rank": "family", "type_genus": "Lactobacillus", "verified": true, "source": "LPSN" },
+    { "name": "Lactobacillales", "rank": "order", "type_genus": "Lactobacillus", "verified": true, "source": "LPSN" },
+    { "name": "Lactobacilleae", "rank": "tribe", "type_genus": "Lactobacillus", "verified": true, "source": "LPSN" },
+    { "name": "Rickettsiaceae", "rank": "family", "type_genus": "Rickettsia", "verified": true, "source": "LPSN" },
+    { "name": "Rickettsiales", "rank": "order", "type_genus": "Rickettsia", "verified": true, "source": "LPSN" },
+    { "name": "Neisseriaceae", "rank": "family", "type_genus": "Neisseria", "verified": true, "source": "LPSN" },
+    { "name": "Deinococcota", "rank": "phylum", "type_genus": "Deinococcus", "verified": true, "source": "LPSN" },
+    { "name": "Treponemataceae", "rank": "family", "type_genus": "Treponema", "verified": true, "source": "LPSN" },
+    { "name": "Bdellovibrionaceae", "rank": "family", "type_genus": "Bdellovibacter", "verified": true, "source": "LPSN" },
+    { "name": "Crenarchaeota", "rank": "phylum", "type_genus": "Crenarchaeum", "verified": true, "source": "LPSN" },
+    { "name": "Acidimicrobidae", "rank": "subclass", "type_genus": "Acidimicrobium", "verified": true, "source": "LPSN" },
+    { "name": "Corynebacterineae", "rank": "suborder", "type_genus": "Corynebacterium", "verified": true, "source": "LPSN" },
+    { "name": "Methanobacteriaceae", "rank": "family", "type_genus": "Methanobacterium", "verified": true, "source": "LPSN" },
+    { "name": "Methanobacteriales", "rank": "order", "type_genus": "Methanobacterium", "verified": true, "source": "LPSN" },
+    { "name": "Methanobacteria", "rank": "class", "type_genus": "Methanobacterium", "verified": true, "source": "LPSN (historical -ia-less class name; see conserved_names)" },
+    { "name": "Klebsiellaceae", "rank": "family", "type_genus": "Klebsiella", "verified": true, "source": "LPSN" },
+    { "name": "Actinomycetota", "rank": "phylum", "type_genus": null, "verified": true, "source": "LPSN — NOT generable from a single Latin type-genus stem in this release; listed so the engine recognises it as published" }
+  ]
+}

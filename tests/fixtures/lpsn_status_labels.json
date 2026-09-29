@@ -1,0 +1,27 @@
+{
+  "_provenance": {
+    "kind": "source-derived status-label enumeration — NOT a live capture",
+    "derived_from": [
+      "VERIFIED (vendored): lpsn-api/README.md:88-96 — the documented retrieve() output shows the lowercase labels 'correct name' and 'synonym'",
+      "UNVERIFIED: the remaining labels are the enumeration LPSN publishes (which the report itself took from the LPSN web vocabulary); the vendored lpsn-api snapshot contains NO status enumeration"
+    ],
+    "live_capture_outstanding": "tests/fixtures/lpsn_status_live.json — to be recorded by the CI live-smoke job (scheduled run) from a real advanced_search response, then diffed against this list; see the exit-code contract in .github/workflows/ci.yml",
+    "consumer": "src/prokname/data/lpsn_status.json (expert-reviewable mapping) and tests/test_online_adapters.py::test_every_documented_status_label_is_classified",
+    "live_capture": false,
+    "as_of": "2026-09-21"
+  },
+  "labels": [
+    { "value": "correct name", "verified_against": "lpsn-api/README.md:89" },
+    { "value": "synonym", "verified_against": "lpsn-api/README.md:90-95" },
+    { "value": "later homonym", "verified_against": "the LPSN status label vocabulary" },
+    { "value": "previous name", "verified_against": "LPSN web vocabulary (no vendored source)" },
+    { "value": "variant", "verified_against": "the LPSN status label vocabulary" },
+    { "value": "cass./orth. var.", "verified_against": "the LPSN status label vocabulary" },
+    { "value": "emend. candidate", "verified_against": "the LPSN status label vocabulary" },
+    { "value": "convalescing name", "verified_against": "the LPSN status label vocabulary" },
+    { "value": "in preparation", "verified_against": "the LPSN status label vocabulary" },
+    { "value": "provisional name", "verified_against": "ala-name-matching nomenclatural_status_codes.csv:15 (different vocabulary, cross-reference only)" },
+    { "value": "non-validly published name", "verified_against": "the LPSN status label vocabularyest read as VALID)" },
+    { "value": "not validly published name", "verified_against": "the LPSN status label vocabulary" }
+  ]
+}

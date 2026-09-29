@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "version": "0.1.0-seed",
+    "suite": "C-set (GAN comparison)",
+    "note": "v0.1 seed. Paper-grade C-set: ≥200 etymologies (person/place/feature), each fed to both GAN and prokname with fixed seed and ≥3 repetitions. Fairness protocol: aligned inputs, independent compliance judgement, report variance.",
+    "target_sizes": {
+      "total": "≥200 etymologies"
+    },
+    "license": "mixed (CC BY-SA 4.0 for LPSN-derived stems; stems themselves may be CC0)"
+  },
+  "cases": [
+    {"stem": "Wukong", "etymology_type": "feature", "source_language": "transliterated", "source": "synthetic", "lpsn_id": null, "annotator": "seed", "annotated_at": "2026-08-16", "license": "CC0", "grammatical_category": "adjective_or_appositive"},
+    {"stem": "Beijing", "etymology_type": "place", "source_language": "transliterated", "source": "synthetic", "lpsn_id": null, "annotator": "seed", "annotated_at": "2026-08-16", "license": "CC0", "grammatical_category": "adjective"},
+    {"stem": "Boyd", "etymology_type": "person", "source_language": "transliterated", "source": "synthetic", "lpsn_id": null, "annotator": "seed", "annotated_at": "2026-08-16", "license": "CC0", "grammatical_category": "genitive"},
+    {"stem": "bacteri", "etymology_type": "feature", "source_language": "latin", "source": "synthetic", "lpsn_id": null, "annotator": "seed", "annotated_at": "2026-08-16", "license": "CC0", "grammatical_category": "adjective_or_appositive"},
+    {"stem": "auto", "etymology_type": "feature", "source_language": "greek", "source": "synthetic", "lpsn_id": null, "annotator": "seed", "annotated_at": "2026-08-16", "license": "CC0", "grammatical_category": "adjective_or_appositive"}
+  ]
+}

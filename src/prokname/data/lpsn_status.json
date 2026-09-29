@@ -1,0 +1,592 @@
+{
+  "_meta": {
+    "version": "0.3.0-two-vocabularies",
+    "as_of": "2026-09-22",
+    "asset_role": "Expert-reviewable label -> claim tables for the LPSN status string. LPSN carries TWO distinct status fields — a nomenclatural status and a taxonomic status — and the page/API emit them comma-joined into one string, so this asset now holds TWO tables and dedup/lpsn.py classifies token by token, deriving validity from the nomenclatural tokens and name occupancy from the taxonomic ones.",
+    "rationale": "The exact-match replacement of the substring test could not read real LPSN output, because no realistic status string is a single label",
+    "field_model": {
+      "nomenclatural": "LPSN page field 'Nomenclatural status' — asserts ONLY whether the name was validly published, and under which code. Contributes validity; can NEVER establish that a name string is occupied or correct.",
+      "taxonomic": "LPSN page field 'Taxonomic status' / API field 'lpsn_taxonomic_status' — asserts ONLY the standing of the name for its taxon (correct / in use / synonym / homonym / orthographic variant). Contributes name occupancy; can NEVER establish ICNP validity.",
+      "joined": "Observed live rendering: 'Nomenclatural status: validly published under the ICNP, conserved name' with 'correct name (and explicitly recommended for medical use)' — a working note since deleted; the LPSN URLs cited alongside are the evidence (https://lpsn.dsmz.de/genus/shigella, https://lpsn.dsmz.de/species/shigella-boydii). A single-label exact matcher over the joined string classifies every realistic record as unknown."
+    },
+    "matching_policy": {
+      "tokenisation": "split on top-level ',' and ';' with parenthesis/bracket depth tracking (a qualifier containing a comma stays one fragment); each fragment's parenthetical text is separated from its bare label and preserved verbatim for the detail string — it is reported, never interpreted and never silently dropped",
+      "normalisation": "per token: str(value) -> strip -> collapse internal whitespace -> casefold",
+      "comparison": "EXACT token-label or alias equality ONLY. Substring / `in` comparison is forbidden (the original defect: it read 'Non-validly published name' as valid), and whole-string comparison is forbidden too (the first-iteration defect: it cannot read comma-joined output).",
+      "cross_vocabulary": "a token is attributed to the ONE vocabulary that lists it. A label listed in both tables, or with conflicting claims, is stored as 'ambiguous' and classifies as unknown. Validity is read only from nomenclatural claims and occupancy only from taxonomic claims, so the two vocabularies cannot be conflated by construction; a status string that carries only nomenclatural tokens yields no occupancy ruling (unknown), and a taxonomic token alone never yields an ICNP-validity claim.",
+      "unknown_token": "category 'unknown' -> the adapter must NOT emit an occupying or a clean verdict; the orchestrator blocks adjudication (see dedup/orchestrator.py NON_RULING_STATUSES).",
+      "non_string_value": "dict/list scalars are flattened best-effort and the flattened text is then tokenised like any other string; an unflattenable value is category 'unknown' (last paragraph: an AttributeError raised outside the try degraded the whole authority layer)."
+    },
+    "categories": {
+      "occupied_valid": {
+        "maps_to": "found_valid",
+        "occupies_name": true,
+        "adjudication": "CONFLICT",
+        "meaning": "LPSN holds a record for exactly this name, the taxonomic tokens say the string occupies the name as its correct name, and the nomenclatural tokens do not contradict validity."
+      },
+      "occupied_other": {
+        "maps_to": "found_occupied",
+        "occupies_name": true,
+        "adjudication": "CONFLICT",
+        "meaning": "The name string is occupied in LPSN but is not the correct, validly-published-under-the-ICNP name (synonym, later homonym, previous name, preferred name of unstated legal basis, a correct name that is not valid under the ICNP, or a name valid only under another code). A new taxon may not be published under it."
+      },
+      "unoccupied_record": {
+        "maps_to": "found_other",
+        "occupies_name": false,
+        "adjudication": "VERIFY_WARNING",
+        "meaning": "LPSN lists the exact string, but the entry does NOT occupy the name (orthographic variants/misspellings, announcements, names that were never validly published or are illegitimate). Surfaced as a warning, never as a hard conflict — over-blocking is the other half of the guarantee."
+      },
+      "unknown": {
+        "maps_to": "found_unknown",
+        "occupies_name": null,
+        "adjudication": "BLOCKED",
+        "meaning": "A token is not in these tables, a token is ambiguous, or the evidence contradicts itself (e.g. 'correct name, synonym'). prokname refuses to guess: no occupancy claim, no clean verdict."
+      }
+    },
+    "combination_matrix": {
+      "note": "Implemented by dedup/lpsn.py combine_status_claims(validity, occupancy); `validity` is derived from the nomenclatural tokens only, `occupancy` from the taxonomic tokens only. 'no taxonomic token' is the cell that makes cross-vocabulary guessing impossible: an ICNP-valid nomenclatural string on its own yields NO ruling.",
+      "rows": [
+        "occupancy=occupies_correct_name + validity=absent -> occupied_valid",
+        "occupancy=occupies_correct_name + validity=valid_under_icnp -> occupied_valid",
+        "occupancy=occupies_correct_name + validity=not_validly_published -> occupied_other",
+        "occupancy=occupies_correct_name + validity=valid_under_other_code -> occupied_other",
+        "occupancy=occupies_correct_name + validity=unasserted -> unknown",
+        "occupancy=occupies_name_in_use | occupied_not_correct + any validity -> occupied_other",
+        "occupancy=does_not_occupy + any validity -> unoccupied_record",
+        "occupancy=absent + validity=not_validly_published -> unoccupied_record",
+        "occupancy=absent + any other validity -> unknown",
+        "contradictory evidence within a vocabulary (correct name + synonym; valid_under_icnp + not_validly_published) -> unknown"
+      ]
+    },
+    "claims": {
+      "nomenclatural": {
+        "valid_under_icnp": "validly published under the ICNP (or retained/conserved under it)",
+        "valid_under_other_code": "validly published under a DIFFERENT code (ICN/ICNafp) — a cross-code flag, NOT an ICNP validity claim",
+        "not_validly_published": "explicitly not validly published / illegitimate / never effectively published (announcement, provisional, in flux)",
+        "unasserted": "matched, but prokname will not read any validity claim out of it"
+      },
+      "taxonomic": {
+        "occupies_correct_name": "the string is the correct name of a taxon ⇒ occupies the name",
+        "occupies_name_in_use": "the string is the name in use, but LPSN does not state the legal basis ⇒ occupies the name, never reported as ICNP-correct",
+        "occupied_not_correct": "the string is occupied by a name that is not the correct one (synonym, homonym, previous name)",
+        "does_not_occupy": "an orthographic fact about another name (variant, orth. var., emendation candidate, misspelling) ⇒ the spelling is listed but does not occupy a name"
+      }
+    },
+    "vocabulary_provenance": [
+      "VERIFIED (vendored): lpsn-api/README.md:88-96 (snapshot LeibnizDSMZ/lpsn-api @ c15229e7) — the documented output of client.retrieve(filter=[\"full_name\", \"lpsn_taxonomic_status\"]), which emits the lowercase labels 'correct name' and 'synonym'. These are the only two status labels the vendored client attests, and they are both TAXONOMIC.",
+      "VERIFIED (vendored): lpsn-api/README.md:21,51,58 and lpsn-api/lpsn/client.py:156-194 — the advanced-search facets 'correct-name' and 'validly-published' are separate parameters: LPSN's own API treats 'correct' and 'validly published' as different claims, which is the basis for splitting this asset into two vocabularies.",
+      "VERIFIED (live pages, relayed by WebFetch): a working note since deleted; the LPSN URLs cited alongside are the evidence — 'validly published under the ICNP' (https://lpsn.dsmz.de/genus/shigella, /class/bacilli, /phylum/bacillota), 'conserved name' and 'correct name (and explicitly recommended for medical use)' (https://lpsn.dsmz.de/species/shigella-boydii), 'not validly published' and 'synonym (and no standing)' (https://lpsn.dsmz.de/phylum/firmicutes), 'validly published under ICN' (https://lpsn.dsmz.de/phylum/cyanobacteria), 'illegitimate name' (LPSN Actinobacteria page), 'preferred name' (§8.1), 'misspelling' (§8.2, observed on https://lpsn.dsmz.de/genus/bacillus). Rows carrying these strings are verified: true.",
+      "UNVERIFIED labels: 'later homonym', 'previous name', 'variant', 'cass./orth. var.', 'emend. candidate', 'convalescing name', 'in preparation', 'provisional name', 'non-validly published name', 'not validly published name' are the enumeration LPSN publishes, as mirrored in tests/fixtures/lpsn_status_labels.json; 'validly published name' was never observed anywhere. None of them was observed on a live page this session, so each carries verified: false: the category is the reviewer's reading of the label, and the adapter must keep the wording provisional (SourceResult.verified=False) until an M0/M2 live capture (tests/fixtures/lpsn_status_live.json) confirms it.",
+      "Secondary cross-reference (vendored, DIFFERENT vocabulary, not LPSN's): ala-name-matching/ala-name-matching-builder/src/main/resources/au/org/ala/names/index/nomenclatural_status_codes.csv:15,18-19,22 — 'original spelling'/'subsequent misspelling' -> ORTHOGRAPHIC_VARIANT, 'emendation' -> CORRECTED, 'manuscript' -> PROVISIONAL. Used only to justify treating variant/emendation/misspelling-type labels as orthographic facts (does_not_occupy) rather than occupancy events.",
+      "NOT added, on purpose: LPSN's glossary concept terms (https://lpsn.dsmz.de/text/glossary — nomen nudum, nomen ambiguum, nomen dubium, nomen confusum, nomen perplexum, rejected name, new combination, nomen novum, revived name, orphaned name) are prose concepts, not observed values of either status field (§8.2). Adding them would be inventing a vocabulary, so any status string containing one stays category 'unknown'. 'descriptive name' (seen only inside a summarised Cyanobacteria quote) is likewise listed in unclassified_labels below rather than given a claim."
+    ],
+    "unclassified_labels": [
+      {
+        "label": "descriptive name",
+        "why": "appears inside the summarised LPSN quote 'validly published under ICN, descriptive name; synonym' (nomenclature_facts.md §4), but which field it belongs to and what it claims could not be sourced; giving it a claim would be inventing a vocabulary.",
+        "effect": "a status string containing it classifies as 'unknown' (BLOCKED)"
+      },
+      {
+        "label": "validly published name",
+        "why": "the bare form was never observed in any vendored or fetched source; it is kept in the nomenclatural table with claim 'unasserted' so that it is visible to reviewers but licenses no ruling on its own.",
+        "effect": "alone -> 'unknown'; with a taxonomic token it still asserts no validity"
+      }
+    ],
+    "status_vocabulary_note": "The full SourceResult status vocabulary (shared by every adapter and read by dedup/orchestrator.py) is documented in src/prokname/dedup/model.py. 'found_synonym' is produced by the REFERENCE tier (GNA isSynonym / NCBI name_class=synonym); LPSN authority results use found_occupied for the same semantics so that the two tiers cannot be confused. 'found_parahomonym' is the REFERENCE-tier spelling signal — the authority-tier counterpart of the same fact is the taxonomic claim 'misspelling' below, surfaced as found_other.",
+    "expert_signoff": "PENDING — every verified: false row needs a live-response citation before its wording may be made confident; the vocabulary split itself (nomenclatural vs taxonomic) is supported by the vendored client's separate 'correct-name' / 'validly-published' facets and by the two page fields quoted above."
+  },
+  "nomenclatural_statuses": [
+    {
+      "label": "validly published under the ICNP",
+      "aliases": [],
+      "claim": "valid_under_icnp",
+      "verified": true,
+      "provenance": "nomenclature_facts.md §8.1/§8.2 — LPSN pages genus/shigella, class/bacilli, phylum/bacillota (fetched 2026-09-22)",
+      "note": "The ICNP validity claim. Read as validity ONLY: without a taxonomic token prokname does not know whether the string occupies a name, so this label alone must not rule."
+    },
+    {
+      "label": "conserved name",
+      "aliases": [],
+      "claim": "valid_under_icnp",
+      "verified": true,
+      "provenance": "nomenclature_facts.md §8.2/§4 — LPSN species/shigella-boydii prints 'validly published under the ICNP, conserved name'",
+      "note": "Nomenclatural modifier: the name is retained against an earlier name. It is a nomenclatural label, never a taxonomic one, and contributes no occupancy claim."
+    },
+    {
+      "label": "validly published under ICN",
+      "aliases": [],
+      "claim": "valid_under_other_code",
+      "verified": true,
+      "provenance": "nomenclature_facts.md §8.2/§4 — LPSN phylum/cyanobacteria",
+      "note": "Cross-code flag: valid under the botanical ICN, NOT under the ICNP. Treating it as ICNP validity is the semantic error this split exists to prevent; combined with 'correct name' it yields occupied_other."
+    },
+    {
+      "label": "not validly published",
+      "aliases": [],
+      "claim": "not_validly_published",
+      "verified": true,
+      "provenance": "nomenclature_facts.md §8.2/§4 — LPSN phylum/firmicutes ('Nomenclatural status: not validly published')",
+      "note": "NEGATED label: never valid. Alone it is a warning, not a conflict."
+    },
+    {
+      "label": "illegitimate name",
+      "aliases": [],
+      "claim": "not_validly_published",
+      "verified": true,
+      "provenance": "nomenclature_facts.md §8.2/§4 — LPSN Actinobacteria page (Opinion 122, Rule 51b)",
+      "note": "Not legitimate ⇒ never a name to publish under. Alone it is a warning (the string is listed, the name is unusable); with a taxonomic occupancy token it becomes a conflict."
+    },
+    {
+      "label": "non-validly published name",
+      "aliases": [
+        "non validly published name",
+        "not effectively published"
+      ],
+      "claim": "not_validly_published",
+      "verified": false,
+      "provenance": "the LPSN status label vocabularys/lpsn_status_labels.json — no vendored or live-page evidence",
+      "note": "NEGATED label. is_valid must be false; the removed substring test returned True because 'non-validly published name' contains 'validly published'."
+    },
+    {
+      "label": "not validly published name",
+      "aliases": [],
+      "claim": "not_validly_published",
+      "verified": false,
+      "provenance": "the LPSN status label vocabularys/lpsn_status_labels.json — no vendored or live-page evidence",
+      "note": "NEGATED label; same failure mode as 'non-validly published name'. The shorter live form is the separate verified row 'not validly published'."
+    },
+    {
+      "label": "in preparation",
+      "aliases": [
+        "in press",
+        "announced"
+      ],
+      "claim": "not_validly_published",
+      "verified": false,
+      "provenance": "the LPSN status label vocabularyr live-page evidence",
+      "note": "Announcement of work in progress: not effective publication, hence not validly published. The name is not occupied — but users are warned that someone is about to publish it (warning tier, not CONFLICT)."
+    },
+    {
+      "label": "provisional name",
+      "aliases": [
+        "provisional"
+      ],
+      "claim": "not_validly_published",
+      "verified": false,
+      "provenance": "tests/fixtures/lpsn_status_labels.json, cross-referenced against ala-name-matching nomenclatural_status_codes.csv:15 (manuscript -> PROVISIONAL)",
+      "note": "Placeholder label (e.g. 'Candidatus'-style proposals): not an available name, warning tier."
+    },
+    {
+      "label": "convalescing name",
+      "aliases": [
+        "convalescing"
+      ],
+      "claim": "not_validly_published",
+      "verified": false,
+      "provenance": "the LPSN status label vocabularyr live-page evidence",
+      "note": "Name under a conservation proposal: status in flux, so it must not be reported as validly published, and it does not block the name currently in use."
+    },
+    {
+      "label": "validly published name",
+      "aliases": [],
+      "claim": "unasserted",
+      "verified": false,
+      "provenance": "NOT observed in any vendored or fetched source; deliberately unclassified",
+      "note": "Claim 'unasserted' on purpose: an unverified bare 'validly published' label must not silently produce a CONFLICT nor a clean verdict. Once a live LPSN response confirms it, an expert should change the claim to valid_under_icnp and set verified: true."
+    }
+  ],
+  "taxonomic_statuses": [
+    {
+      "label": "correct name",
+      "aliases": [
+        "correct"
+      ],
+      "claim": "occupies_correct_name",
+      "verified": true,
+      "provenance": "lpsn-api/README.md:89 (vendored snapshot c15229e7) + nomenclature_facts.md §8.2 LPSN pages",
+      "note": "The only label that licenses the occupancy claim 'this is the correct name'. It asserts nothing about ICNP validity: an accompanying 'validly published under ICN' or 'not validly published' token downgrades the verdict to occupied_other."
+    },
+    {
+      "label": "preferred name",
+      "aliases": [],
+      "claim": "occupies_name_in_use",
+      "verified": false,
+      "provenance": "nomenclature_facts.md §8.1/§8.2 — observed as a value of LPSN's taxonomic status, but its legal basis is not printed on the page",
+      "note": "The name in use, so the string is occupied — but 'preferred' is not 'correct' and its legal basis is unverified, so it may never be reported as an ICNP-valid correct name (occupied_other, provisional wording)."
+    },
+    {
+      "label": "synonym",
+      "aliases": [
+        "taxonomic synonym",
+        "nomenclatural synonym",
+        "objective synonym",
+        "subjective synonym"
+      ],
+      "claim": "occupied_not_correct",
+      "verified": true,
+      "provenance": "lpsn-api/README.md:90-95 (vendored snapshot c15229e7) + nomenclature_facts.md §8.2 (incl. 'synonym (and no standing)', LPSN phylum/firmicutes)",
+      "note": "The name exists and is occupied (it is a synonym of some other name); it may not be reused for a different taxon. A parenthetical qualifier such as 'and no standing' is preserved in the detail."
+    },
+    {
+      "label": "later homonym",
+      "aliases": [
+        "homonym",
+        "junior homonym",
+        "illegitimate later homonym"
+      ],
+      "claim": "occupied_not_correct",
+      "verified": false,
+      "provenance": "the LPSN status label vocabularys/lpsn_status_labels.json — no vendored or live-page evidence",
+      "note": "Occupies the string: an earlier homonym has priority."
+    },
+    {
+      "label": "previous name",
+      "aliases": [
+        "previously published name"
+      ],
+      "claim": "occupied_not_correct",
+      "verified": false,
+      "provenance": "the LPSN status label vocabularys/lpsn_status_labels.json — no vendored or live-page evidence",
+      "note": "A name that was used for the taxon and is now superseded; the string remains occupied."
+    },
+    {
+      "label": "misspelling",
+      "aliases": [],
+      "claim": "does_not_occupy",
+      "verified": true,
+      "provenance": "nomenclature_facts.md §8.2 — observed on LPSN genus/bacillus; cross-referenced against ala-name-matching nomenclatural_status_codes.csv:18-19 ('subsequent misspelling' -> ORTHOGRAPHIC_VARIANT)",
+      "note": "THE PARAHOMONYM SIGNAL, not a synonym: an orthographic variant of another name. Warning tier (the reference tier reports the same fact as found_parahomonym); it must never be routed into the synonym bucket."
+    },
+    {
+      "label": "variant",
+      "aliases": [
+        "var."
+      ],
+      "claim": "does_not_occupy",
+      "verified": false,
+      "provenance": "the LPSN status label vocabularys/lpsn_status_labels.json; cross-referenced against ala-name-matching nomenclatural_status_codes.csv:18-19 (ORTHOGRAPHIC_VARIANT)",
+      "note": "An orthographic variant of another name — it does not occupy this spelling as an independent name. Warning tier, never CONFLICT (over-blocking half of M4)."
+    },
+    {
+      "label": "cass./orth. var.",
+      "aliases": [
+        "orth. var.",
+        "cass. orth. var.",
+        "orth variant"
+      ],
+      "claim": "does_not_occupy",
+      "verified": false,
+      "provenance": "the LPSN status label vocabulary; cross-referenced against ala-name-matching nomenclatural_status_codes.csv:18-19",
+      "note": "Conserved combination / orthographic variant label: an orthographic fact, not an occupancy event."
+    },
+    {
+      "label": "emend. candidate",
+      "aliases": [
+        "emendation candidate",
+        "emend. pro pend."
+      ],
+      "claim": "does_not_occupy",
+      "verified": false,
+      "provenance": "the LPSN status label vocabulary; cross-referenced against ala-name-matching nomenclatural_status_codes.csv:22 (emendation -> CORRECTED)",
+      "note": "A proposed emendation awaiting judgement — the correct name is still the unemended one."
+    }
+  ],
+  "statuses": [
+    {
+      "label": "validly published under the ICNP",
+      "aliases": [],
+      "vocabulary": "nomenclatural",
+      "claim": "valid_under_icnp",
+      "category": "unknown",
+      "maps_to": "found_unknown",
+      "is_valid": false,
+      "occupies_name": null,
+      "verified": true,
+      "provenance": "nomenclature_facts.md §8.1/§8.2 — LPSN pages genus/shigella, class/bacilli, phylum/bacillota (fetched 2026-09-22)",
+      "note": "The ICNP validity claim. Read as validity ONLY: without a taxonomic token prokname does not know whether the string occupies a name, so this label alone must not rule."
+    },
+    {
+      "label": "conserved name",
+      "aliases": [],
+      "vocabulary": "nomenclatural",
+      "claim": "valid_under_icnp",
+      "category": "unknown",
+      "maps_to": "found_unknown",
+      "is_valid": false,
+      "occupies_name": null,
+      "verified": true,
+      "provenance": "nomenclature_facts.md §8.2/§4 — LPSN species/shigella-boydii prints 'validly published under the ICNP, conserved name'",
+      "note": "Nomenclatural modifier: the name is retained against an earlier name. It is a nomenclatural label, never a taxonomic one, and contributes no occupancy claim."
+    },
+    {
+      "label": "validly published under ICN",
+      "aliases": [],
+      "vocabulary": "nomenclatural",
+      "claim": "valid_under_other_code",
+      "category": "unknown",
+      "maps_to": "found_unknown",
+      "is_valid": false,
+      "occupies_name": null,
+      "verified": true,
+      "provenance": "nomenclature_facts.md §8.2/§4 — LPSN phylum/cyanobacteria",
+      "note": "Cross-code flag: valid under the botanical ICN, NOT under the ICNP. Treating it as ICNP validity is the semantic error this split exists to prevent; combined with 'correct name' it yields occupied_other."
+    },
+    {
+      "label": "not validly published",
+      "aliases": [],
+      "vocabulary": "nomenclatural",
+      "claim": "not_validly_published",
+      "category": "unoccupied_record",
+      "maps_to": "found_other",
+      "is_valid": false,
+      "occupies_name": false,
+      "verified": true,
+      "provenance": "nomenclature_facts.md §8.2/§4 — LPSN phylum/firmicutes ('Nomenclatural status: not validly published')",
+      "note": "NEGATED label: never valid. Alone it is a warning, not a conflict."
+    },
+    {
+      "label": "illegitimate name",
+      "aliases": [],
+      "vocabulary": "nomenclatural",
+      "claim": "not_validly_published",
+      "category": "unoccupied_record",
+      "maps_to": "found_other",
+      "is_valid": false,
+      "occupies_name": false,
+      "verified": true,
+      "provenance": "nomenclature_facts.md §8.2/§4 — LPSN Actinobacteria page (Opinion 122, Rule 51b)",
+      "note": "Not legitimate ⇒ never a name to publish under. Alone it is a warning (the string is listed, the name is unusable); with a taxonomic occupancy token it becomes a conflict."
+    },
+    {
+      "label": "non-validly published name",
+      "aliases": [
+        "non validly published name",
+        "not effectively published"
+      ],
+      "vocabulary": "nomenclatural",
+      "claim": "not_validly_published",
+      "category": "unoccupied_record",
+      "maps_to": "found_other",
+      "is_valid": false,
+      "occupies_name": false,
+      "verified": false,
+      "provenance": "the LPSN status label vocabularys/lpsn_status_labels.json — no vendored or live-page evidence",
+      "note": "NEGATED label. is_valid must be false; the removed substring test returned True because 'non-validly published name' contains 'validly published'."
+    },
+    {
+      "label": "not validly published name",
+      "aliases": [],
+      "vocabulary": "nomenclatural",
+      "claim": "not_validly_published",
+      "category": "unoccupied_record",
+      "maps_to": "found_other",
+      "is_valid": false,
+      "occupies_name": false,
+      "verified": false,
+      "provenance": "the LPSN status label vocabularys/lpsn_status_labels.json — no vendored or live-page evidence",
+      "note": "NEGATED label; same failure mode as 'non-validly published name'. The shorter live form is the separate verified row 'not validly published'."
+    },
+    {
+      "label": "in preparation",
+      "aliases": [
+        "in press",
+        "announced"
+      ],
+      "vocabulary": "nomenclatural",
+      "claim": "not_validly_published",
+      "category": "unoccupied_record",
+      "maps_to": "found_other",
+      "is_valid": false,
+      "occupies_name": false,
+      "verified": false,
+      "provenance": "the LPSN status label vocabularyr live-page evidence",
+      "note": "Announcement of work in progress: not effective publication, hence not validly published. The name is not occupied — but users are warned that someone is about to publish it (warning tier, not CONFLICT)."
+    },
+    {
+      "label": "provisional name",
+      "aliases": [
+        "provisional"
+      ],
+      "vocabulary": "nomenclatural",
+      "claim": "not_validly_published",
+      "category": "unoccupied_record",
+      "maps_to": "found_other",
+      "is_valid": false,
+      "occupies_name": false,
+      "verified": false,
+      "provenance": "tests/fixtures/lpsn_status_labels.json, cross-referenced against ala-name-matching nomenclatural_status_codes.csv:15 (manuscript -> PROVISIONAL)",
+      "note": "Placeholder label (e.g. 'Candidatus'-style proposals): not an available name, warning tier."
+    },
+    {
+      "label": "convalescing name",
+      "aliases": [
+        "convalescing"
+      ],
+      "vocabulary": "nomenclatural",
+      "claim": "not_validly_published",
+      "category": "unoccupied_record",
+      "maps_to": "found_other",
+      "is_valid": false,
+      "occupies_name": false,
+      "verified": false,
+      "provenance": "the LPSN status label vocabularyr live-page evidence",
+      "note": "Name under a conservation proposal: status in flux, so it must not be reported as validly published, and it does not block the name currently in use."
+    },
+    {
+      "label": "validly published name",
+      "aliases": [],
+      "vocabulary": "nomenclatural",
+      "claim": "unasserted",
+      "category": "unknown",
+      "maps_to": "found_unknown",
+      "is_valid": false,
+      "occupies_name": null,
+      "verified": false,
+      "provenance": "NOT observed in any vendored or fetched source; deliberately unclassified",
+      "note": "Claim 'unasserted' on purpose: an unverified bare 'validly published' label must not silently produce a CONFLICT nor a clean verdict. Once a live LPSN response confirms it, an expert should change the claim to valid_under_icnp and set verified: true."
+    },
+    {
+      "label": "correct name",
+      "aliases": [
+        "correct"
+      ],
+      "vocabulary": "taxonomic",
+      "claim": "occupies_correct_name",
+      "category": "occupied_valid",
+      "maps_to": "found_valid",
+      "is_valid": true,
+      "occupies_name": true,
+      "verified": true,
+      "provenance": "lpsn-api/README.md:89 (vendored snapshot c15229e7) + nomenclature_facts.md §8.2 LPSN pages",
+      "note": "The only label that licenses the occupancy claim 'this is the correct name'. It asserts nothing about ICNP validity: an accompanying 'validly published under ICN' or 'not validly published' token downgrades the verdict to occupied_other."
+    },
+    {
+      "label": "preferred name",
+      "aliases": [],
+      "vocabulary": "taxonomic",
+      "claim": "occupies_name_in_use",
+      "category": "occupied_other",
+      "maps_to": "found_occupied",
+      "is_valid": false,
+      "occupies_name": true,
+      "verified": false,
+      "provenance": "nomenclature_facts.md §8.1/§8.2 — observed as a value of LPSN's taxonomic status, but its legal basis is not printed on the page",
+      "note": "The name in use, so the string is occupied — but 'preferred' is not 'correct' and its legal basis is unverified, so it may never be reported as an ICNP-valid correct name (occupied_other, provisional wording)."
+    },
+    {
+      "label": "synonym",
+      "aliases": [
+        "taxonomic synonym",
+        "nomenclatural synonym",
+        "objective synonym",
+        "subjective synonym"
+      ],
+      "vocabulary": "taxonomic",
+      "claim": "occupied_not_correct",
+      "category": "occupied_other",
+      "maps_to": "found_occupied",
+      "is_valid": false,
+      "occupies_name": true,
+      "verified": true,
+      "provenance": "lpsn-api/README.md:90-95 (vendored snapshot c15229e7) + nomenclature_facts.md §8.2 (incl. 'synonym (and no standing)', LPSN phylum/firmicutes)",
+      "note": "The name exists and is occupied (it is a synonym of some other name); it may not be reused for a different taxon. A parenthetical qualifier such as 'and no standing' is preserved in the detail."
+    },
+    {
+      "label": "later homonym",
+      "aliases": [
+        "homonym",
+        "junior homonym",
+        "illegitimate later homonym"
+      ],
+      "vocabulary": "taxonomic",
+      "claim": "occupied_not_correct",
+      "category": "occupied_other",
+      "maps_to": "found_occupied",
+      "is_valid": false,
+      "occupies_name": true,
+      "verified": false,
+      "provenance": "the LPSN status label vocabularys/lpsn_status_labels.json — no vendored or live-page evidence",
+      "note": "Occupies the string: an earlier homonym has priority."
+    },
+    {
+      "label": "previous name",
+      "aliases": [
+        "previously published name"
+      ],
+      "vocabulary": "taxonomic",
+      "claim": "occupied_not_correct",
+      "category": "occupied_other",
+      "maps_to": "found_occupied",
+      "is_valid": false,
+      "occupies_name": true,
+      "verified": false,
+      "provenance": "the LPSN status label vocabularys/lpsn_status_labels.json — no vendored or live-page evidence",
+      "note": "A name that was used for the taxon and is now superseded; the string remains occupied."
+    },
+    {
+      "label": "misspelling",
+      "aliases": [],
+      "vocabulary": "taxonomic",
+      "claim": "does_not_occupy",
+      "category": "unoccupied_record",
+      "maps_to": "found_other",
+      "is_valid": false,
+      "occupies_name": false,
+      "verified": true,
+      "provenance": "nomenclature_facts.md §8.2 — observed on LPSN genus/bacillus; cross-referenced against ala-name-matching nomenclatural_status_codes.csv:18-19 ('subsequent misspelling' -> ORTHOGRAPHIC_VARIANT)",
+      "note": "THE PARAHOMONYM SIGNAL, not a synonym: an orthographic variant of another name. Warning tier (the reference tier reports the same fact as found_parahomonym); it must never be routed into the synonym bucket."
+    },
+    {
+      "label": "variant",
+      "aliases": [
+        "var."
+      ],
+      "vocabulary": "taxonomic",
+      "claim": "does_not_occupy",
+      "category": "unoccupied_record",
+      "maps_to": "found_other",
+      "is_valid": false,
+      "occupies_name": false,
+      "verified": false,
+      "provenance": "the LPSN status label vocabularys/lpsn_status_labels.json; cross-referenced against ala-name-matching nomenclatural_status_codes.csv:18-19 (ORTHOGRAPHIC_VARIANT)",
+      "note": "An orthographic variant of another name — it does not occupy this spelling as an independent name. Warning tier, never CONFLICT (over-blocking half of M4)."
+    },
+    {
+      "label": "cass./orth. var.",
+      "aliases": [
+        "orth. var.",
+        "cass. orth. var.",
+        "orth variant"
+      ],
+      "vocabulary": "taxonomic",
+      "claim": "does_not_occupy",
+      "category": "unoccupied_record",
+      "maps_to": "found_other",
+      "is_valid": false,
+      "occupies_name": false,
+      "verified": false,
+      "provenance": "the LPSN status label vocabulary; cross-referenced against ala-name-matching nomenclatural_status_codes.csv:18-19",
+      "note": "Conserved combination / orthographic variant label: an orthographic fact, not an occupancy event."
+    },
+    {
+      "label": "emend. candidate",
+      "aliases": [
+        "emendation candidate",
+        "emend. pro pend."
+      ],
+      "vocabulary": "taxonomic",
+      "claim": "does_not_occupy",
+      "category": "unoccupied_record",
+      "maps_to": "found_other",
+      "is_valid": false,
+      "occupies_name": false,
+      "verified": false,
+      "provenance": "the LPSN status label vocabulary; cross-referenced against ala-name-matching nomenclatural_status_codes.csv:22 (emendation -> CORRECTED)",
+      "note": "A proposed emendation awaiting judgement — the correct name is still the unemended one."
+    }
+  ],
+  "fallback": {
+    "claim": "unclassified",
+    "rationale": "Any token absent from BOTH vocabularies (or listed in both) is unknown; prokname then refuses a confident verdict instead of guessing from substrings or from the other vocabulary."
+  }
+}

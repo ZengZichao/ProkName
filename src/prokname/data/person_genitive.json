@@ -1,0 +1,150 @@
+{
+  "_meta": {
+    "version": "0.2.0-m0",
+    "asset_kind": "latinization declension paradigm -> genitive ending (one-dimensional model)",
+    "status": "M0 draft. The genitive ending of a person-derived epithet is decided by the DECLENSION PARADIGM the surname was latinized into — not by the honoured person's sex and not by the stem's final letter. Only 'surnames' entries (each anchored to a published LPSN epithet) may be used to assert compliance; paradigm/defaults entries yield a proposal that is always flagged needs_review / compliant=None.",
+    "provenance": [
+      "ICNP (2022) orthography rules on specific epithets formed from personal names: genitive of a latinized surname; the ending follows the paradigm chosen by the latinizer (-ius -> -ii, -a -> -ae, 3rd-declension -er -> -i).",
+      "LPSN (lpsn.dsmz.de) published epithets, cited per entry as 'lpsn_instances'.",
+      "The 2x2 'person gender x stem-final letter' table got 3 of 6 real names wrong (Burgdorfer -> burgdorferi, Hensel -> henselae, Gordon -> gordonae)."
+    ],
+    "why_the_2x2_table_was_wrong": "female_consonant_stem='iae' is correct only when the surname was latinized as a 1st-declension noun in -ia; the general 1st-declension ending is -ae, which applies to MALE honourees too (Hensel -> henselae, Gordon -> gordonae). Male consonant stems are not always -ii either (Burgdorfer -> burgdorferi). Gender therefore does not select the ending; the paradigm does, and the paradigm is only knowable from the published name.",
+    "counter_example_anchoring_the_v1_3_fix": "Shigella boydii: feminine genus + male person -> boydii (a genitive noun does not decline with the genus gender).",
+    "how_to_extend": "add the latinized surname (lowercase, latinized as by engine/orthography.latinize) with its paradigm, the published epithet and the source; set verified=true only with a published instance."
+  },
+  "paradigms": {
+    "first_declension_a": {
+      "latinization": "surname cast as a 1st-declension noun in -a (nom. -a, gen. -ae)",
+      "genitive_ending": "ae",
+      "depends_on_person_gender": false,
+      "verified": true,
+      "lpsn_instances": [
+        { "name": "Bartonella henselae", "honoured": "Hensel", "person_gender": "male" },
+        { "name": "Mycobacterium gordonae", "honoured": "Gordon", "person_gender": "male" },
+        { "name": "Oenococcus kitaharae", "honoured": "Kitahara", "person_gender": "male" }
+      ]
+    },
+    "second_declension_ius": {
+      "latinization": "surname cast as a 2nd-declension noun in -ius/-us (gen. -i), doubled -i- in the genitive by nomenclatural practice",
+      "genitive_ending": "ii",
+      "depends_on_person_gender": false,
+      "verified": true,
+      "lpsn_instances": [
+        { "name": "Shigella boydii", "honoured": "Boyd", "person_gender": "male" },
+        { "name": "Lactobacillus delbrueckii", "honoured": "Delbrück", "person_gender": "male" },
+        { "name": "Coxiella burnetii", "honoured": "Burnet", "person_gender": "male" },
+        { "name": "Rickettsia rickettsii", "honoured": "Ricketts", "person_gender": "male" },
+        { "name": "Lactobacillus werkmanii", "honoured": "Werkman", "person_gender": "male" },
+        { "name": "Escherichia fergusonii", "honoured": "Ferguson", "person_gender": "male" },
+        { "name": "Methanocaldococcus jannaschii", "honoured": "Jannasch", "person_gender": "male" },
+        { "name": "Clostridium beijerinckii", "honoured": "Beijerinck", "person_gender": "male" },
+        { "name": "Klebsiella trevisanii", "honoured": "Trevisan", "person_gender": "male" },
+        { "name": "Bacillus subtilis subsp. spizizenii", "honoured": "Spizizen", "person_gender": "male" }
+      ]
+    },
+    "third_declension_er": {
+      "latinization": "surname already ending in -er, treated as a 3rd-declension noun (Burgdorfer, gen. Burgdorferi)",
+      "genitive_ending": "i",
+      "depends_on_person_gender": false,
+      "verified": true,
+      "lpsn_instances": [
+        { "name": "Borrelia burgdorferi", "honoured": "Burgdorfer", "person_gender": "male" },
+        { "name": "Pseudomonas stutzeri", "honoured": "Stutzer", "person_gender": "male" },
+        { "name": "Citrobacter koseri", "honoured": "Koser", "person_gender": "male" }
+      ]
+    },
+    "first_declension_ia": {
+      "latinization": "surname cast as a 1st-declension noun in -ia (gen. -iae)",
+      "genitive_ending": "iae",
+      "depends_on_person_gender": false,
+      "verified": false,
+      "lpsn_instances": [],
+      "note": "This is the ONLY situation in which the old female_consonant_stem='iae' cell held. No LPSN instance was inspected for this repository, so the paradigm is shipped unverified and any value taken from it is needs_review by construction."
+    },
+    "third_declension_consonant": {
+      "latinization": "surname cast as a 3rd-declension consonant-stem noun (gen. -is)",
+      "genitive_ending": "is",
+      "depends_on_person_gender": false,
+      "verified": false,
+      "lpsn_instances": [],
+      "note": "kept for completeness of the paradigm axis; never populated from memory, hence unverified."
+    }
+  },
+  "surnames": {
+    "boyd": { "paradigm": "second_declension_ius", "verified": true, "source": "LPSN Shigella boydii" },
+    "delbrueck": { "paradigm": "second_declension_ius", "verified": true, "source": "LPSN Lactobacillus delbrueckii" },
+    "hensel": { "paradigm": "first_declension_a", "verified": true, "source": "LPSN Bartonella henselae (MALE honouree, -ae ending)" },
+    "gordon": { "paradigm": "first_declension_a", "verified": true, "source": "LPSN Mycobacterium gordonae (MALE honouree, -ae ending)" },
+    "kitahara": { "paradigm": "first_declension_a", "verified": true, "source": "LPSN Oenococcus kitaharae" },
+    "burgdorfer": { "paradigm": "third_declension_er", "verified": true, "source": "LPSN Borrelia burgdorferi" },
+    "stutzer": { "paradigm": "third_declension_er", "verified": true, "source": "LPSN Pseudomonas stutzeri" },
+    "koser": { "paradigm": "third_declension_er", "verified": true, "source": "LPSN Citrobacter koseri" },
+    "burnet": { "paradigm": "second_declension_ius", "verified": true, "source": "LPSN Coxiella burnetii" },
+    "ricketts": { "paradigm": "second_declension_ius", "verified": true, "source": "LPSN Rickettsia rickettsii" },
+    "werkman": { "paradigm": "second_declension_ius", "verified": true, "source": "LPSN Lactobacillus werkmanii" },
+    "beijerinck": { "paradigm": "second_declension_ius", "verified": true, "source": "LPSN Clostridium beijerinckii" },
+    "ferguson": { "paradigm": "second_declension_ius", "verified": true, "source": "LPSN Escherichia fergusonii" },
+    "jannasch": { "paradigm": "second_declension_ius", "verified": true, "source": "LPSN Methanocaldococcus jannaschii" },
+    "trevisan": { "paradigm": "second_declension_ius", "verified": true, "source": "LPSN Klebsiella trevisanii" },
+    "spizizen": { "paradigm": "second_declension_ius", "verified": true, "source": "LPSN Bacillus subtilis subsp. spizizenii" },
+    "hermann": { "paradigm": "second_declension_ius", "verified": true, "source": "LPSN Escherichia hermannii" },
+    "pasteur": { "paradigm": "second_declension_ius", "verified": true, "source": "LPSN Sporosarcina pasteurii (Bacillus pasteurii)" }
+  },
+  "defaults": [
+    {
+      "id": "surname_in_a_is_first_declension",
+      "if_surname_ends_with": "a",
+      "paradigm": "first_declension_a",
+      "verified": false,
+      "note": "usually right (Kitahara -> kitaharae) but the paradigm choice belongs to the latinizer"
+    },
+    {
+      "id": "surname_in_er_is_third_declension",
+      "if_surname_ends_with": "er",
+      "paradigm": "third_declension_er",
+      "verified": false,
+      "note": "Burgdorfer -> burgdorferi; Bdellovibacter-style irregular stems exist, so never assert compliance"
+    },
+    {
+      "id": "male_consonant_surname_default",
+      "if_person_gender": "male",
+      "if_surname_ends_with": "consonant",
+      "paradigm": "second_declension_ius",
+      "verified": false,
+      "note": "most common historical latinization for consonant-final surnames; a PROPOSAL only (Hensel/Gordon are the documented counter-examples -> -ae)"
+    },
+    {
+      "id": "female_consonant_surname_default",
+      "if_person_gender": "female",
+      "if_surname_ends_with": "consonant",
+      "paradigm": "first_declension_ia",
+      "verified": false,
+      "note": "carries over the old female_consonant_stem='iae' cell, now explicitly marked unverified: it presupposes a -ia latinization. The general 1st-declension form would be -ae. Expert sign-off required either way."
+    }
+  ],
+  "variant_tolerance": {
+    "_note": "Genuinely consumed by engine/validate.py::_person_genitive_result (the previous branch was dead because 'i' was not a value of any cell). Now that the 3rd-declension -er paradigm populates '-i', the pair {-i, -ii} is reachable.",
+    "genitive_i_ii": {
+      "acceptable_pair": ["i", "ii"],
+      "applies_when": "the surname is NOT attested in 'surnames' with verified:true",
+      "never_overrides": "an attested published form (an attested mismatch is reported as non-compliant, with the tolerance named in the note)",
+      "status": "grading tolerance for benchmark B2; M0 list"
+    },
+    "double_consonants": "tolerate single/doubled consonant spelling variants where LPSN records both (documentation only — not consumed by the engine)"
+  },
+  "verified_examples": [
+    { "name": "Shigella boydii", "person_gender": "male", "paradigm": "second_declension_ius", "source": "LPSN" },
+    { "name": "Lactobacillus delbrueckii", "person_gender": "male", "paradigm": "second_declension_ius", "source": "LPSN" },
+    { "name": "Borrelia burgdorferi", "person_gender": "male", "paradigm": "third_declension_er", "source": "LPSN" },
+    { "name": "Bartonella henselae", "person_gender": "male", "paradigm": "first_declension_a", "source": "LPSN" },
+    { "name": "Mycobacterium gordonae", "person_gender": "male", "paradigm": "first_declension_a", "source": "LPSN" },
+    { "name": "Coxiella burnetii", "person_gender": "male", "paradigm": "second_declension_ius", "source": "LPSN" },
+    { "name": "Rickettsia rickettsii", "person_gender": "male", "paradigm": "second_declension_ius", "source": "LPSN" },
+    { "name": "Lactobacillus werkmanii", "person_gender": "male", "paradigm": "second_declension_ius", "source": "LPSN" }
+  ],
+  "pending_examples": [
+    { "wanted": "one real LPSN epithet whose surname was latinized as 1st-declension -ia (-iae)", "task": "M0 sign-off; until then the first_declension_ia paradigm stays verified:false and any value taken from it is needs_review" },
+    { "wanted": "one real LPSN epithet honouring a WOMAN", "task": "M0 sign-off — the engine no longer assumes the ending depends on the honoured person's sex, so this only has to confirm that claim" },
+    { "wanted": "an LPSN instance for the 3rd-declension -is paradigm", "task": "M0 sign-off" }
+  ]
+}

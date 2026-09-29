@@ -1,0 +1,112 @@
+# DATA LICENSE
+
+[English](DATA_LICENSE) | [中文](DATA_LICENSE.zh.md)
+
+The *code* of prokname is distributed under the MIT License (see `LICENSE`).
+
+The *data assets* shipped in `src/prokname/data/` follow the licenses of their
+sources and are distributed under the corresponding terms:
+
+## `genus_gender.json`, `corpus` LPSN-derived parts
+
+Derived from LPSN (List of Prokaryotic names with Standing in Nomenclature,
+https://lpsn.dsmz.de/). LPSN data (including downloads and API data) is
+distributed under **CC BY-SA 4.0**. Derivative works must therefore:
+
+1. Cite the LPSN reference designated on the LPSN site and state the access
+   date of the data.
+2. Link back to the LPSN source pages when redistributing electronically.
+3. Inherit the CC BY-SA 4.0 license (ShareAlike).
+
+Human-curated entries added by the prokname authors that are not derived from
+LPSN text (plain facts: genus name -> grammatical gender) are released under
+CC0 1.0; the file as a whole is distributed under CC BY-SA 4.0 to comply with
+the ShareAlike obligation of the LPSN-derived portion.
+
+## `rules.json`, `gender_endings.json`, `person_genitive.json`, `stems.json`
+
+Rules distilled from the International Code of Nomenclature of Prokaryotes
+(ICNP) orthography appendix and general Latin grammar. Nomenclatural codes and
+rules as such are not subject to copyright; the JSON expression here is
+released under **CC0 1.0** (dedicated to the public domain by the authors),
+except where a cell is explicitly marked as transcribed from a copyrighted
+source, in which case the source's terms apply.
+
+## Status notice
+
+`person_genitive.json` models the latinisation *declension paradigms* behind
+person-derived genitive epithets (ICNP Rule 20 orthography), not a
+person-gender × stem-letter grid. Only the paradigms anchored to published LPSN
+epithets and the attested surnames built on them are flagged `verified: true`;
+the `-iae`, `-is` and `-ae`-by-default paradigms ship as `verified: false`
+proposals pending sign-off against the ICNP orthography appendix, and the
+orthographic variant tolerance list is likewise an M0 deliverable.
+
+Commercial users should additionally note potential CBD benefit-sharing
+obligations (Cali Fund) flagged by DSMZ for LPSN-derived digital sequence
+information use.
+
+## SeqCode Registry data — resolved 2026-09-25
+
+The upstream terms were read, and they are quoted here rather than paraphrased.
+From the footer of https://registry.seqco.de/page/api, retrieved 2026-09-25:
+
+> © 2022-2026 The SeqCode Initiative
+> All information contributed to the SeqCode Registry is released under the
+> terms of the Creative Commons Attribution (CC BY) 4.0 license
+
+So the "SeqCode data: CC-BY 4.0" attribution that `storage/store.py`,
+`tests/fixtures/manifest.json` and `corpus_seed.json` emit is **correct**, and
+it is now backed by the source instead of carried over from an earlier draft.
+
+What that means concretely for this repository:
+
+* `src/prokname/data/seqcode_registered.json` — a dated snapshot of the names
+  the Registry reports as validly published under SeqCode, built by
+  `scripts/build_seqcode_snapshot.py` — is redistributed under CC BY 4.0. The
+  obligation is attribution: keep the `_meta.licence` / `_meta.attribution`
+  fields, and cite the SeqCode Initiative plus the per-name
+  `https://seqco.de/i:<id>` URIs when republishing.
+* CC BY 4.0 carries **no ShareAlike**, unlike the CC BY-SA 4.0 that governs the
+  LPSN-derived assets above. Where a single file mixes both kinds of content,
+  the stricter (BY-SA) obligation governs the whole file — see item 2 below.
+* This addresses copyright and licence. It does **not** settle whether the
+  European sui generis database right is engaged by extracting the full name
+  list; the Registry publishes no statement on that. The snapshot's own
+  `_meta` records the retrieval date and source endpoint so the extent of the
+  extraction is at least transparent. If a release artefact redistributes the
+  snapshot separately rather than shipping it inside the package, ask the
+  SeqCode Initiative to confirm.
+
+**Still unresolved, recorded rather than assumed away:**
+
+1. **What CC BY-SA 4.0 ShareAlike implies for our own derived assets.**
+   ShareAlike travels with the *derivative work*, not with the fact that a
+   figure was re-typed by hand. Concretely: an asset that reproduces or is
+   based upon LPSN text (e.g. `genus_gender.json`, whose gender values are
+   transcribed from LPSN) must be re-published under CC BY-SA 4.0 — which is
+   why that file is distributed under BY-SA even though its CC0-worthy cells
+   are author-curated. A rule table whose *wording and selection* is
+   independent of LPSN text (nomenclatural rules are not themselves subject to
+   copyright) can stay CC0 1.0 — but the moment such a file's contents are
+   copied from, or made by bulk reference to, an LPSN-derived source, the
+   BY-SA obligation attaches to the whole file and the file-level licence must
+   change with it. Mixing both kinds of content in one asset therefore forces
+   the stricter licence, and the per-asset derivations below have not been
+   audited cell by cell.
+2. **Consequence for re-publishing derived rule assets.** Before any asset is
+   mirrored into a public dataset, a release archive or any redistributed
+   supplement, its derivation must be recorded (source, access date, which cells
+   are author-curated). That audit has not been performed; it is an M0 item.
+3. **Two shipped assets are not enumerated by the sections above.**
+   `type_genus_stems.json` (type-genus declension stems plus a list of attested
+   suprageneric names) and `lpsn_status.json` (a map of LPSN's
+   `lpsn_taxonomic_status` labels) are both keyed on vocabulary published by
+   LPSN, so the CC BY-SA 4.0 section is plausibly the governing one — but that
+   has not been audited entry by entry, and neither file carries a licence
+   field. Until the audit is done, treat both as governed by the LPSN terms and
+   do not re-license them as CC0.
+
+Resolving items 1–3 (and the database-right question raised above) is a
+prerequisite for any public redistribution of these assets, including a data
+availability statement.
