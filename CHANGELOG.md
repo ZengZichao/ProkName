@@ -268,6 +268,10 @@ share is the presentation policy described below.
   mixed-provenance rule assets before any of them is mirrored into a public dataset or
   release archive, and whether the European sui generis database right is engaged by
   redistributing the full SeqCode name list.
-- **Registration entries still pending**: a Zenodo DOI and a bio.tools record.
+- **Registration entries still pending**: a bio.tools record. Zenodo is done — the
+  v0.1.0 release was archived 2026-09-30 as version DOI
+  [10.5281/zenodo.23052778](https://doi.org/10.5281/zenodo.23052778) under concept DOI
+  [10.5281/zenodo.23052777](https://doi.org/10.5281/zenodo.23052777), which is what
+  `CITATION.cff` and both README languages record.
 - The cited references' DOIs (Freese 2026, Ratatoskr, Trüper & de'Clari) are still to be
   verified.

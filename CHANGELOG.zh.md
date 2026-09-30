@@ -208,5 +208,8 @@ ICNP 或 SeqCode 下的正式发表程序决定，本工具的输出不构成有
   而不是一次通过。
 - **两项许可问题仍未解决**：混合来源的规则资产在被镜像进公共数据集或发布归档之前需要
   逐格衍生审计；以及完整 SeqCode 名单的再分发是否触发欧洲的 sui generis 数据库权。
-- **待补的注册条目**：Zenodo DOI 与 bio.tools 记录。
+- **待补的注册条目**：bio.tools 记录。Zenodo 已完成 —— v0.1.0 于 2026-09-30 归档，版本 DOI
+  [10.5281/zenodo.23052778](https://doi.org/10.5281/zenodo.23052778)，隶属 concept DOI
+  [10.5281/zenodo.23052777](https://doi.org/10.5281/zenodo.23052777)；`CITATION.cff` 与中英
+  两份 README 记录的都是后者。
 - 被引文献的 DOI（Freese 2026、Ratatoskr、Trüper & de'Clari）仍有待核验。

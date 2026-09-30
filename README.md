@@ -15,6 +15,11 @@ ships. A rule's origin is never cited as a section of an undistributed document:
 external facts are checkable in `docs/provenance/`, licence terms in
 `DATA_LICENSE`, and the rule itself in the shipped data asset.
 
+`M0` / `M1` / `M2` below are this project's milestone labels, used the same way
+throughout `USAGE.md`: **M0** is the rule-asset and authority-data work that needs
+expert sign-off before the engine's rules can be treated as evidence, **M1** is the
+generation and validation engine, **M2** is the paper-scale benchmark expansion.
+
 | Plan module | Status in this repo |
 |---|---|
 | M0 rule assets (`rules.json`, `person_genitive.json`, `gender_endings.json`, `genus_gender.json`, `stems.json`) | shipped, **expert sign-off pending** — see `prokname data` |
@@ -203,29 +208,3 @@ If you use prokname, please cite the software (`CITATION.cff`):
 Code: MIT (`LICENSE`). Data: see `DATA_LICENSE` — CC BY-SA 4.0 for
 LPSN-derived parts, CC0 1.0 for the hand-built rule files, and CC BY 4.0 for
 SeqCode Registry data (quoted from the upstream source, 2026-09-25).
-
-## M0 checklist (gates before M1 relies on the rule assets)
-
-1. Expert sign-off on `rules.json` / `person_genitive.json` (fill the
-   vowel-stem cells from the ICNP orthography appendix; restructure the
-   person-genitive table around latinisation paradigms and re-verify each
-   populated cell against real LPSN names).
-2. LPSN real-name verification script for every documented example.
-3. Live recording of the LPSN endpoint contract (`dedup/lpsn.py` graduates
-   from `unavailable`; a recorded VCR cassette for CI replay ships with this
-   step). **SeqCode: recorded 2026-09-25** — the contract is documented in
-   docs/provenance/seqcode-registry-2026-09-25.md and the adapter now rules
-   from a dated occupancy snapshot, positively only. What remains for SeqCode
-   is not a recording but a capability the Registry does not offer: a
-   complete, stable list or a lookup by name (see item 6).
-4. Citation DOI verification (Freese 2026, Ratatoskr, Trüper & de'Clari series).
-5. **Done 2026-09-25.** The SeqCode-derived redistribution terms are quoted
-   from the Registry's own API page in `DATA_LICENSE` (CC BY 4.0). The
-   remaining licence work is listed there: the cell-level derivation audit and
-   the database-right question.
-6. New, from the same probe: SeqCode's `status=SeqCode` list must become
-   complete and stable (or a by-name endpoint must exist) before
-   `dedup/seqcode.py` may ever answer "not registered". Until then it returns
-   `found_unknown` for a miss, which blocks adjudication exactly as an
-   unreachable authority does — deliberately, because an incomplete list is
-   not evidence of absence.

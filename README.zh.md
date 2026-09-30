@@ -10,6 +10,8 @@
 
 下表逐项说明本仓库实际交付了什么。规则的出处不会被写成某份未随包文档的小节：外部事实可在 `docs/provenance/` 核对，许可条款见 `DATA_LICENSE`，规则本身见随包数据资产。
 
+下表中的 `M0` / `M1` / `M2` 是本项目的里程碑代号，`USAGE.md` 中用法一致：**M0** 指规则资产与权威源核验，需专家签字后才能把引擎的规则当作证据；**M1** 指生成与校验引擎；**M2** 指论文级基准扩充。
+
 | 方案模块 | 本仓库状态 |
 |---|---|
 | M0 规则资产（`rules.json`、`person_genitive.json`、`gender_endings.json`、`genus_gender.json`、`stems.json`） | 已交付，**专家签字待定**，见 `prokname data` |
@@ -128,14 +130,3 @@ prokname holdout                 # CI 门禁：A-"推断"子集 ∩ 词库 = ∅
 - **Zenodo 存档**：concept DOI [10.5281/zenodo.23052777](https://doi.org/10.5281/zenodo.23052777)，始终解析到最新版本；本版本 v0.1.0 对应 [10.5281/zenodo.23052778](https://doi.org/10.5281/zenodo.23052778)
 
 代码采用 MIT 许可（见 `LICENSE`）。数据许可见 `DATA_LICENSE`：LPSN 衍生部分为 CC BY-SA 4.0，自研规则文件为 CC0 1.0，SeqCode Registry 数据为 CC BY 4.0（2026-09-25 摘自上游页面）。
-
-## M0 检查清单
-
-以下 5 项是 M1 依赖规则资产的前置门控。
-
-1. `rules.json` / `person_genitive.json` 专家签字（从 ICNP 正字法附录填充元音词干格子；把人名属格表按拉丁化变格范式重构，并逐格对照真实 LPSN 名称复核）。
-2. 方案中全部示例名的 LPSN 实名校验脚本。
-3. LPSN 端点契约的实时记录（`dedup/lpsn.py` 随后从 `unavailable` 毕业；CI 回放所用的录制带随该步一并交付）。**SeqCode 已于 2026-09-25 完成记录**：契约见 docs/provenance/seqcode-registry-2026-09-25.md，适配器改为依据带日期的占用快照裁定，且只给肯定答复。SeqCode 还缺的不是一次录制，而是注册中心目前没有的能力：完整且稳定的名单，或按名字查询（见第 6 项）。
-4. 引文 DOI 核验（Freese 2026、Ratatoskr、Trüper & de'Clari 系列）。
-5. **已于 2026-09-25 完成**：`DATA_LICENSE` 已引用注册中心自己页面的 SeqCode 条款（CC BY 4.0）。该文件中剩下的许可工作是逐格来源审计与数据库权利问题。
-6. 由同一次探测新增：在 SeqCode 能提供完整且稳定的名单（或按名字查询端点）之前，`dedup/seqcode.py` 一律不得回答“未注册”。在此之前，未命中只返回 `found_unknown`，其阻断裁定的效果与权威源不可用完全相同——这是有意的，因为不完整的名单不等于不存在的证据。
