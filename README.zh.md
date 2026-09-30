@@ -10,8 +10,6 @@
 
 下表逐项说明本仓库实际交付了什么。规则的出处不会被写成某份未随包文档的小节：外部事实可在 `docs/provenance/` 核对，许可条款见 `DATA_LICENSE`，规则本身见随包数据资产。
 
-下表中的 `M0` / `M1` / `M2` 是本项目的里程碑代号，`USAGE.md` 中用法一致：**M0** 指规则资产与权威源核验，需专家签字后才能把引擎的规则当作证据；**M1** 指生成与校验引擎；**M2** 指论文级基准扩充。
-
 | 方案模块 | 本仓库状态 |
 |---|---|
 | M0 规则资产（`rules.json`、`person_genitive.json`、`gender_endings.json`、`genus_gender.json`、`stems.json`） | 已交付，**专家签字待定**，见 `prokname data` |

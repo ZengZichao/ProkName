@@ -15,11 +15,6 @@ ships. A rule's origin is never cited as a section of an undistributed document:
 external facts are checkable in `docs/provenance/`, licence terms in
 `DATA_LICENSE`, and the rule itself in the shipped data asset.
 
-`M0` / `M1` / `M2` below are this project's milestone labels, used the same way
-throughout `USAGE.md`: **M0** is the rule-asset and authority-data work that needs
-expert sign-off before the engine's rules can be treated as evidence, **M1** is the
-generation and validation engine, **M2** is the paper-scale benchmark expansion.
-
 | Plan module | Status in this repo |
 |---|---|
 | M0 rule assets (`rules.json`, `person_genitive.json`, `gender_endings.json`, `genus_gender.json`, `stems.json`) | shipped, **expert sign-off pending** — see `prokname data` |
