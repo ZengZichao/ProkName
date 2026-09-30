@@ -10,20 +10,7 @@ for naming new prokaryotic taxa under the **ICNP** and the **SeqCode**.
 > prokname provides decision support only. Name validity is determined solely
 > by formal publication under the ICNP or the SeqCode — never by this tool.
 
-The module map below states, for each capability, what this repository actually
-ships. A rule's origin is never cited as a section of an undistributed document:
-external facts are checkable in `docs/provenance/`, licence terms in
-`DATA_LICENSE`, and the rule itself in the shipped data asset.
-
-| Plan module | Status in this repo |
-|---|---|
-| M0 rule assets (`rules.json`, `person_genitive.json`, `gender_endings.json`, `genus_gender.json`, `stems.json`) | shipped, **expert sign-off pending** — see `prokname data` |
-| M1 engine: three-way grammatical categories, dual-mode gender, agreement validation, generation, orthography | implemented |
-| Dual-code routing (viable paths + trade-offs, ICNP-preemption-first, GTDB boundary) | implemented |
-| Two-tier dedup: local near-match (parahomonym) scan | implemented (demo seed corpus) |
-| Dedup: authority adapters (LPSN / SeqCode Registry) | **M0-gated scaffolds** — honestly return `unavailable` (never fabricate); live endpoints/credentials to be recorded at M0 |
-| Seed benchmark A/B1/B2/C/D sets (74 / 26 / 17 / 5×3 / 11 cases, holdout-controlled) | implemented (CI-grade seeds; LPSN-derived paper-grade expansion is M1/M2) |
-| Project storage (create/add/show/rate/export/delete) | implemented (`prokname project`) |
+External facts are checkable in `docs/provenance/`, licence terms in `DATA_LICENSE`, and the rule itself in the shipped data asset — a rule's origin is never cited as a section of an undistributed document.
 
 ## Install
 

@@ -8,17 +8,7 @@
 
 > prokname 仅提供命名辅助决策。名称的有效性完全由 ICNP 或 SeqCode 下的正式发表程序决定，本工具的输出不构成有效性裁定。
 
-下表逐项说明本仓库实际交付了什么。规则的出处不会被写成某份未随包文档的小节：外部事实可在 `docs/provenance/` 核对，许可条款见 `DATA_LICENSE`，规则本身见随包数据资产。
-
-| 方案模块 | 本仓库状态 |
-|---|---|
-| M0 规则资产（`rules.json`、`person_genitive.json`、`gender_endings.json`、`genus_gender.json`、`stems.json`） | 已交付，**专家签字待定**，见 `prokname data` |
-| M1 构词引擎：三分语法类别、双模式性别判定、性数格校验、生成、正字法 | 已实现 |
-| 双法典路由（可行路径与利弊对比、ICNP 先占优先、GTDB 边界交代） | 已实现 |
-| 两级查重：本地近似名（parahomonym）扫描 | 已实现（演示级种子语料） |
-| 查重：权威源适配器（LPSN、SeqCode Registry） | **M0 前置门控脚手架**，诚实返回 `unavailable`（绝不伪造）；实时端点与凭据待 M0 记录 |
-| 三源全量近似扫描语料、论文级 A/B/C/D 基准集 | 种子级基准已实现（A 74 / B1 26 / B2 17 / C 5×3 / D 11 例，留出受控）；LPSN 衍生论文级扩充为 M1/M2 交付物 |
-| 项目存储（创建/添加/展示/打分/导出/删除） | 已实现（`prokname project`） |
+外部事实可在 `docs/provenance/` 核对，许可条款见 `DATA_LICENSE`，规则本身见随包数据资产 —— 规则的出处不会被写成某份未随包文档的小节。
 
 ## 安装
 
