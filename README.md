@@ -2,6 +2,8 @@
 
 [English](README.md) | [中文](README.zh.md)
 
+[![DOI: 10.5281/zenodo.23052777](https://zenodo.org/badge/DOI/10.5281/zenodo.23052777.svg)](https://doi.org/10.5281/zenodo.23052777)
+
 Prokaryotic nomenclature assistant: deterministic, auditable decision support
 for naming new prokaryotic taxa under the **ICNP** and the **SeqCode**.
 
@@ -196,6 +198,7 @@ Measured boundaries of what this repository demonstrates today (details in
 If you use prokname, please cite the software (`CITATION.cff`):
 
 - **Zichao Zeng** (ORCID [0000-0001-6553-970X](https://orcid.org/0000-0001-6553-970X))
+- **Zenodo**: concept DOI [10.5281/zenodo.23052777](https://doi.org/10.5281/zenodo.23052777), which always resolves to the latest archived release; this version is [10.5281/zenodo.23052778](https://doi.org/10.5281/zenodo.23052778)
 
 Code: MIT (`LICENSE`). Data: see `DATA_LICENSE` — CC BY-SA 4.0 for
 LPSN-derived parts, CC0 1.0 for the hand-built rule files, and CC BY 4.0 for

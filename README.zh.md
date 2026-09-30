@@ -2,6 +2,8 @@
 
 [English](README.md) | [中文](README.zh.md)
 
+[![DOI: 10.5281/zenodo.23052777](https://zenodo.org/badge/DOI/10.5281/zenodo.23052777.svg)](https://doi.org/10.5281/zenodo.23052777)
+
 原核生物命名辅助工具。prokname 以确定性规则和可审计的决策支持为核心，帮助研究者为细菌与古菌的新分类单元拟定学名，并核对 **ICNP**（国际原核生物命名法规）与 **SeqCode**（原核生物序列命名规范）的合规要求。
 
 > prokname 仅提供命名辅助决策。名称的有效性完全由 ICNP 或 SeqCode 下的正式发表程序决定，本工具的输出不构成有效性裁定。
@@ -123,6 +125,7 @@ prokname holdout                 # CI 门禁：A-"推断"子集 ∩ 词库 = ∅
 若 prokname 对您的研究有帮助，请引用本软件（`CITATION.cff`）：
 
 - **Zichao Zeng**（ORCID [0000-0001-6553-970X](https://orcid.org/0000-0001-6553-970X)）
+- **Zenodo 存档**：concept DOI [10.5281/zenodo.23052777](https://doi.org/10.5281/zenodo.23052777)，始终解析到最新版本；本版本 v0.1.0 对应 [10.5281/zenodo.23052778](https://doi.org/10.5281/zenodo.23052778)
 
 代码采用 MIT 许可（见 `LICENSE`）。数据许可见 `DATA_LICENSE`：LPSN 衍生部分为 CC BY-SA 4.0，自研规则文件为 CC0 1.0，SeqCode Registry 数据为 CC BY 4.0（2026-09-25 摘自上游页面）。
 

@@ -13,6 +13,9 @@ authors:
 type: software
 version: 0.1.0
 date-released: "2026-09-29"
+# The Zenodo concept DOI, not a version DOI: it resolves to the latest archived
+# release and never needs bumping alongside `version`, so it cannot drift.
+doi: "10.5281/zenodo.23052777"
 license: MIT
 license-url: "https://opensource.org/licenses/MIT"
 repository-code: "https://github.com/ZengZichao/ProkName"
@@ -48,5 +51,6 @@ preferred-citation:
   # `version:` above; tests/test_version_consistency.py enforces both.
   version: 0.1.0
   date-released: "2026-09-29"
+  doi: "10.5281/zenodo.23052777"
   license: MIT
   repository-code: "https://github.com/ZengZichao/ProkName"
