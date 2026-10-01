@@ -16,4 +16,4 @@
 # transitive package, add it to pyproject.toml so it is declared once.
 
 typer>=0.12,<1.0
-rich>=13.0,<15.0
+rich>=13.0,<16.0
