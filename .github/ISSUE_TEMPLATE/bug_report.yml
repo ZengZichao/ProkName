@@ -1,0 +1,59 @@
+name: Bug report / 缺陷报告
+description: >-
+  Report a wrong verdict, crash, or packaging problem.
+  报告错误的判定结果、崩溃或安装打包问题。
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time. For upstream data drift (LPSN / SeqCode /
+        GNA answers that differ from the pinned contracts), please mention
+        that explicitly — there is a field for it below.
+        感谢反馈。若是上游数据漂移（LPSN / SeqCode / GNA 与契约锚定不符），
+        请在对应字段明确说明。
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened? / 发生了什么
+      description: >-
+        Expected vs actual verdict (e.g. `prokname check` returned 0/CLEAN
+        but LPSN says the name is occupied). 期望结果与实际结果。
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction / 复现方式
+      placeholder: |
+        prokname check "Escherichia coli" --online
+        (full command and output)
+    validations:
+      required: true
+  - type: dropdown
+    id: source
+    attributes:
+      label: Category / 类别
+      options:
+        - Wrong verdict (engine/routing) — 判定错误
+        - Online authority drift — 上游数据漂移
+        - Crash / traceback — 崩溃
+        - Install / packaging / wheel — 安装与打包
+        - Docs wrong or stale — 文档过期
+        - Other — 其他
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version / 版本
+      placeholder: "`prokname --version` output, or commit hash"
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: OS & Python / 系统与 Python
+      placeholder: "e.g. macOS 15, Python 3.12"
+    validations:
+      required: false
