@@ -159,6 +159,13 @@ jobs:
     if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
 
+    # Secrets live at job level (not on the consuming step) so the step-level
+    # `if: env.PROKNAME_LPSN_USER != ''` guards below can read them: the env
+    # context in a step's `if` cannot see that same step's own env block.
+    env:
+      PROKNAME_LPSN_USER: ${{ secrets.LPSN_USER }}
+      PROKNAME_LPSN_PASSWORD: ${{ secrets.LPSN_PASSWORD }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -215,9 +222,7 @@ jobs:
       # A red scheduled run therefore means: re-check the LPSN/GNA adapters and
       # the tests/fixtures/ contract pins before trusting any online result.
       - name: Live smoke (LPSN/SeqCode/GNA — drift fails the scheduled run)
-        env:
-          PROKNAME_LPSN_USER: ${{ secrets.LPSN_USER }}
-          PROKNAME_LPSN_PASSWORD: ${{ secrets.LPSN_PASSWORD }}
+        if: env.PROKNAME_LPSN_USER != ''
         run: |
           overall=0
           for name in "Escherichia coli" "Bacillus subtilis"; do
@@ -234,3 +239,28 @@ jobs:
             fi
           done
           exit "$overall"
+
+      - name: LPSN credentials missing (live smoke skipped, not failed)
+        if: env.PROKNAME_LPSN_USER == ''
+        # Skipped-with-a-warning instead of red: without LPSN_USER the
+        # authority is unreachable by construction, so a failure here would
+        # say "contract drift" every Monday while saying nothing about drift.
+        # This is the ONLY skip path in this job — once the secret exists,
+        # the step above is back to being allowed to fail.
+        run: |
+          echo "::warning title=Live smoke skipped::Actions secrets LPSN_USER / LPSN_PASSWORD are not configured, so the LPSN live contract check cannot run. Add them under Settings → Secrets and actions to re-enable it; until then this scheduled job covers SeqCode + citation drift only."
+
+  ci-summary:
+    name: CI summary
+    # Single required-check anchor: branch protection on main requires this
+    # one context instead of enumerating the test matrix (which changes when
+    # the matrix does). It is green only when every gate job was green.
+    needs: [lint, test, wheel-smoke]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if any gate job failed or was cancelled
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: exit 1
+      - name: All gate jobs green
+        run: echo "lint, test matrix and wheel-smoke all passed."
