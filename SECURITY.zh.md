@@ -1,5 +1,7 @@
 # 安全政策
 
+[English](SECURITY.md) | [中文](SECURITY.zh.md)
+
 ## 支持的版本
 
 ProkName 处于早期开发阶段（`0.1.x`），只有 `main` 最新提交与最近一个标签
@@ -27,7 +29,3 @@ Security → "Report a vulnerability"），细节将保密直至修复发布。�
 
 - CLI 只向调用方指定的位置写输出，不提权、不监听网络端口；安装期与运行期
   的暴露面限于声明的 PyPI 依赖。
-
----
-
-English version: [SECURITY.md](SECURITY.md).

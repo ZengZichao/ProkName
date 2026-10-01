@@ -1,5 +1,7 @@
 # Security Policy
 
+[English](SECURITY.md) | [中文](SECURITY.zh.md)
+
 ## Supported versions
 
 ProkName is in early development (`0.1.x`); only the latest commit on `main`
@@ -35,7 +37,3 @@ You can expect an initial response within 7 days.
 - The CLI writes all output to the caller-selected locations; it does not
   elevate privileges or listen on network sockets. Install-time and runtime
   exposure is limited to the declared PyPI dependencies.
-
----
-
-安全政策（中文版）见 [SECURITY.zh.md](SECURITY.zh.md)。
