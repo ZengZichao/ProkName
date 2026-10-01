@@ -12,7 +12,7 @@
 
 # Runtime (mirror of pyproject.toml [project].dependencies)
 typer>=0.12,<1.0
-rich>=13.0,<15.0
+rich>=13.0,<16.0
 
 # Dev (mirror of pyproject.toml [project.optional-dependencies].dev)
 pytest>=8.0
