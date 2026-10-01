@@ -143,7 +143,7 @@ jobs:
           /tmp/prokname-smoke/bin/prokname gen --stem Boyd --type person \
             --rank species --genus Shigella --person-gender male --json
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: wheel
           path: dist/*.whl
