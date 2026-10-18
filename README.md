@@ -15,10 +15,17 @@ External facts are checkable in `docs/provenance/`, licence terms in `DATA_LICEN
 ## Install
 
 ```bash
+pip install prokname
+# optional: enable `prokname check --online` (official lpsn client, httpx, keyring)
+pip install "prokname[online]"
+```
+
+For development, install from a clone instead:
+
+```bash
 cd prokname
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-# optional: enable `prokname check --online` (official lpsn client, httpx, keyring)
 pip install -e ".[online]"
 ```
 

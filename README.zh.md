@@ -13,10 +13,17 @@
 ## 安装
 
 ```bash
+pip install prokname
+# 可选：启用 `prokname check --online`（官方 lpsn 客户端、httpx、keyring）
+pip install "prokname[online]"
+```
+
+开发场景请改为从克隆安装：
+
+```bash
 cd prokname
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-# 可选：启用 `prokname check --online`（官方 lpsn 客户端、httpx、keyring）
 pip install -e ".[online]"
 ```
 
