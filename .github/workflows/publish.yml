@@ -13,6 +13,15 @@ name: Publish to PyPI
 on:
   release:
     types: [published]
+  # Manual escape hatch: re-publish an existing tag after a failed upload
+  # (e.g. the trusted publisher was misconfigured on the first attempt)
+  # without re-publishing the GitHub Release. Pass the tag, e.g. v0.1.0.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Git tag to build and publish (must match the wheel version)'
+        required: true
+        type: string
 
 # Nothing at workflow level; the publish job grants exactly what OIDC needs.
 permissions: {}
@@ -21,12 +30,15 @@ jobs:
   build:
     name: Build sdist + wheel
     runs-on: ubuntu-latest
+    env:
+      # One source for both triggers: the release's tag, or the manual input.
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
     steps:
       - uses: actions/checkout@v7
         # Build the commit the release tag points at, not whatever main is at
         # publish time — the released tarball must be reproducible from the tag.
         with:
-          ref: ${{ github.event.release.tag_name }}
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
           persist-credentials: false
 
       - name: Set up Python
@@ -45,11 +57,10 @@ jobs:
         # A wheel whose metadata contradicts the tag would publish under a
         # name PyPI assigns from metadata — fail here instead.
         run: |
-          tag="${{ github.event.release.tag_name }}"
           wheel_version=$(ls dist/*.whl | sed -E 's/.*-([0-9][^-]*)-py3.*\.whl/\1/')
-          echo "tag=$tag wheel=$wheel_version"
-          [ "v$wheel_version" = "$tag" ] || {
-            echo "::error::wheel version $wheel_version does not match release tag $tag"
+          echo "tag=$TAG wheel=$wheel_version"
+          [ "v$wheel_version" = "$TAG" ] || {
+            echo "::error::wheel version $wheel_version does not match tag $TAG"
             exit 1
           }
 
