@@ -3,6 +3,8 @@
 [English](README.md) | [中文](README.zh.md)
 
 [![DOI: 10.5281/zenodo.23052777](https://zenodo.org/badge/DOI/10.5281/zenodo.23052777.svg)](https://doi.org/10.5281/zenodo.23052777)
+[![PyPI - Version](https://img.shields.io/pypi/v/prokname)](https://pypi.org/project/prokname/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/prokname)](https://pypi.org/project/prokname/)
 
 Prokaryotic nomenclature assistant: deterministic, auditable decision support
 for naming new prokaryotic taxa under the **ICNP** and the **SeqCode**.
