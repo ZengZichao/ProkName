@@ -5,6 +5,8 @@
 [![DOI: 10.5281/zenodo.23052777](https://zenodo.org/badge/DOI/10.5281/zenodo.23052777.svg)](https://doi.org/10.5281/zenodo.23052777)
 [![PyPI - Version](https://img.shields.io/pypi/v/prokname)](https://pypi.org/project/prokname/)
 [![Python 3.11-3.14](https://img.shields.io/badge/python-3.11--3.14-blue)](https://pypi.org/project/prokname/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![ORCID](https://img.shields.io/badge/ORCID-0000--0001--6553--970X-a6ce39?logo=orcid&logoColor=white)](https://orcid.org/0000-0001-6553-970X)
 
 Prokaryotic nomenclature assistant: deterministic, auditable decision support
 for naming new prokaryotic taxa under the **ICNP** and the **SeqCode**.
