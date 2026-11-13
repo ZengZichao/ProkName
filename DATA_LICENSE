@@ -2,6 +2,12 @@
 
 [English](DATA_LICENSE) | [中文](DATA_LICENSE.zh.md)
 
+This English text is the authoritative licence record. `DATA_LICENSE.zh.md` is its
+Chinese companion, provided for reading convenience: where the two differ, the
+English text governs, and quoted upstream licence statements are kept in their
+original language in both copies. This note states precedence only; it changes no
+licence term and adds no obligation.
+
 The *code* of prokname is distributed under the MIT License (see `LICENSE`).
 
 The *data assets* shipped in `src/prokname/data/` follow the licenses of their
@@ -55,9 +61,14 @@ From the footer of https://registry.seqco.de/page/api, retrieved 2026-09-25:
 > All information contributed to the SeqCode Registry is released under the
 > terms of the Creative Commons Attribution (CC BY) 4.0 license
 
-So the "SeqCode data: CC-BY 4.0" attribution that `storage/store.py`,
-`tests/fixtures/manifest.json` and `corpus_seed.json` emit is **correct**, and
-it is now backed by the source instead of carried over from an earlier draft.
+So the "SeqCode data: CC-BY 4.0" attribution is **correct**, and it is now
+backed by the source instead of carried over from an earlier draft. The string
+is emitted by `storage/store.py`, which writes the single `SEQCODE_ATTRIBUTION`
+constant defined in `src/prokname/__init__.py`; the licence is likewise declared
+in the `_meta.licence` / `_meta.attribution` fields of
+`src/prokname/data/seqcode_registered.json` and in `corpus_seed.json`'s
+`_meta.provenance`. `tests/fixtures/manifest.json` carries no licence string: it
+is a test-evidence inventory.
 
 What that means concretely for this repository:
 
@@ -92,7 +103,7 @@ What that means concretely for this repository:
    copied from, or made by bulk reference to, an LPSN-derived source, the
    BY-SA obligation attaches to the whole file and the file-level licence must
    change with it. Mixing both kinds of content in one asset therefore forces
-   the stricter licence, and the per-asset derivations below have not been
+   the stricter licence, and the per-asset derivations above have not been
    audited cell by cell.
 2. **Consequence for re-publishing derived rule assets.** Before any asset is
    mirrored into a public dataset, a release archive or any redistributed

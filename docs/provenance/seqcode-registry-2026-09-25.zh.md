@@ -5,20 +5,21 @@
 > **以英文原文 `seqcode-registry-2026-09-25.md` 为权威文本。** 本文件是其中文对照版；
 > 两者不一致时以英文原文为准。所有 URL、HTTP 响应头、被引原文与计数一律保留原始形态。
 
-本记录解决两件事 —— `src/prokname/dedup/seqcode.py` 与 `DATA_LICENSE` 曾把它们记为未
+本记录解决两件事——`src/prokname/dedup/seqcode.py` 与 `DATA_LICENSE` 曾把它们记为未
 决问题：
 
 1. M0 翻转清单第 1 项（"record the endpoint path/method/parameters from
    https://registry.seqco.de/page/api"）与第 3 项（"confirm the field names that
    answer 'registered / valid under SeqCode'"）；
-2. `DATA_LICENSE` 当时记下的"未解决 —— SeqCode 衍生数据的再分发条款"，其内容是：本
-   仓库从未读过、也未引用过注册中心自己公布的条款。
+2. `DATA_LICENSE` 关于 SeqCode 衍生数据再分发条款的那个未解决项——也就是该文件现在
+   题为 `SeqCode Registry data — resolved 2026-09-25` 的那一节，它当时记录的是：本仓库
+   从未读过、也未引用过注册中心自己公布的条款。
 
 以下全部内容读取自 **2026-09-25（UTC）** 的线上服务，属本仓库自身优化轮的一部分。
 没有编造任何端点；`prokname` 禁止猜测 URL 的策略依然有效，而本文件存在的理由正是让
 这条策略的证据留在仓库之内，而不是留在某个 `/tmp` 目录或某个维护者的记忆里。
 
-## 查问过来源
+## 查考过的来源
 
 | 内容 | URL | 备注 |
 | --- | --- | --- |
@@ -63,7 +64,7 @@ names/(id).json 另外记载 rank, status_name, priority_date,
 | --- | --- | --- |
 | `page/status.json` | `{"status": "ok"}` | ✅ 与文档一致 |
 | `names.json` 参数 | 仅 `page`、`status` | ✅ 两者都生效；**没有其他参数被记载，也没有其他参数可用** |
-| `names.json?status=…` 词表 | `public`、`automated`、`SeqCode`、`ICNP`、`ICNafp`、`valid` | ✅ 六个取值都返回数据；**未知取值返回 `count: 0` 而不报错**（静默为空 —— 拼错一个字母读起来就像"没人注册过"） |
+| `names.json?status=…` 词表 | `public`、`automated`、`SeqCode`、`ICNP`、`ICNafp`、`valid` | ✅ 六个取值都返回数据；**未知取值返回 `count: 0` 而不报错**（静默为空——把取值打错时，读起来就像“没人注册过”） |
 | `names.json?status=public` | — | `count: 48407`，`total_pages: 1614` |
 | `names.json?status=valid` | — | `count: 39339` |
 | `names.json?status=ICNP` | — | `count: 34951` |
@@ -72,42 +73,44 @@ names/(id).json 另外记载 rank, status_name, priority_date,
 | `names.json?status=ICNafp` | — | `count: 1038` |
 | 每页条数 | 未记载 | **固定 30 条；`per_page` / `limit` / `pp` / `page_size` 全部被忽略** |
 | 按名查询 | 未记载 | **不存在。** `?name=`、`?q=`、`?search=` 都被静默忽略，返回未经筛选的 48 407 条全量名单 |
-| `names/1.json` | 有记载，且以 `https://api.seqco.de/v1/names/1.json` 为示例 | ❌ **返回 `text/html`（该名的网页）而非 JSON** —— 文档中的 JSON 详情端点并未在文档中的路径上提供服务 |
+| `names/1.json` | 有记载，且以 `https://api.seqco.de/v1/names/1.json` 为示例 | ❌ **返回 `text/html`（该名的网页）而非 JSON**——文档中的 JSON 详情端点并未在文档中的路径上提供服务 |
 
 ## 对 ProkName 的后果（这就是本次发现）
 
-**1. `check` 无法在联网模式下经此 API 回答"是否已依 SeqCode 注册？"**
+**1. `check` 无法在联网模式下经此 API 回答“是否已依 SeqCode 注册？”**
 不存在按名查询。要拿一个名字去比对 `status=SeqCode`，唯一的办法是走查全部 112 页；
 要比对整个注册中心，则是 1 614 页。就单次查询而言，这既不礼貌、也不快，还与
-`data/rate_limit_budget.json` 想要表达的那份请求预算不相容。因此适配器**绝不能**凭本
-记录就把 `_M0_ENDPOINT_VERIFIED = True` 翻上去：清单第 2 与第 5 项（每个*实际使用*的
-端点都要有一份提交的线上 JSON cassette，以及一次全绿的计划 live-smoke）仍然成立，而
-第 1 项的答案是"能回答这个问题的端点并不存在"。
+`data/rate_limit_budget.json` 想要表达的那份请求预算不相容。因此**绝不能**依据本记录，就把该适配器
+当作有权给出否定答复的一方：本记录所能支持的开关只有 `dedup/seqcode.py` 里的
+`_POSITIVE_RULINGS_VERIFIED = True`，它覆盖的是实际观察到的占用认定；快照中不存在的名字
+返回 `FOUND_UNKNOWN`，绝不返回 `not_found`。清单第 2 与第 5 项（每个*实际使用*的端点都要
+有一份已提交的线上 JSON 录制带，以及一次全绿的计划任务 live-smoke）仍然成立，而在本源
+得以给出否定答复之前仍未了结的事项，以数据形式保存在同一模块的 `M0_FLIP_CHECKLIST` 中；
+第 1 项的答案是“能回答这个问题的端点并不存在”。
 
-**2. `status=valid` 绝不可读作"已依 SeqCode 有效发表"。**
+**2. `status=valid` 绝不可读作“已依 SeqCode 有效发表”。**
 它返回 39 339 个名字，是 `status=SeqCode` 那 3 350 个的十二倍。这正是清单第 3 项所警告
 的那个陷阱（"do NOT reuse LPSN's `full_name` / `lpsn_taxonomic_status` naming"）：直观
 的筛选名在上游意味着别的东西。任何后续实现都必须以 `status=SeqCode` 为键，并且必须把
 无法识别的 status 取值上的 `count: 0` 当作 `unavailable` 处理，绝不当作 `not_found`。
 
 **3. 离线快照这条路是唯一可行的，而且代价很低。**
-3 350 个 SeqCode 名 × 每页 30 条 = 112 页，一次有界的抓取，与本仓库
-`scripts/rebuild_corpus.py` 对 LPSN 衍生近似名语料所做的事形状相同。一份带版本号的
+3 350 个 SeqCode 名 × 112 页（每页 30 条），是一次有界的抓取，其形状与本仓库
+`scripts/rebuild_corpus.py` 已为 LPSN 衍生近似名语料所做的事相同。一份带版本号的
 `seqcode_registered.json` 快照可以让 `check` 从本地数据给出当前无法达到的三个裁定
 （`NO_CLEAR_CONFLICT`、`VERIFY_WARNING`、`PARAHOMONYM_WARNING`），这也正是 M0 想要的
-"可专家签字、可审计"的姿态：一份有日期、有署名的快照，胜过一次答案每次都在变的答案的
+“可专家签字、可审计”的姿态：一份有日期、有署名的快照，胜过一次答案每次运行都在变的
 在线调用。
 
-这是一次设计变更（新增随包数据资产、新增刷新节奏、并了结一项许可义务 —— 见下），
-所以此处按"建议路径"记录，而未单方面实施。
+这是一次设计变更（新增随包数据资产、新增刷新节奏、并了结一项许可义务——见下），
+所以此处按“建议路径”记录，而未单方面实施。
 
 **4. 与本仓库已携带的计数交叉核对。**
-`seqcode.py` 的文档字符串写着 "48,386 names / 3,338 validly published under SeqCode
-as of 2026-08-16"。2026-09-25 线上实测：`status=public` 48 407，`status=SeqCode` 3 350。
-两者都按预期方向增长了约 0.05 % 与 0.4 %，历时六周。这独立地佐证了文档字符串所指确实是
-`status=SeqCode` 那个计数 —— 而不是 `status=valid`（39 339）。
+`seqcode.py` 的文档字符串报告：全表 48 407 个名字，`status=SeqCode` 抓取为 112 页 /
+3 350 行，二者均为 2026-09-25 的实测值——与本次线上实测的数值一致，这就确定了代码以
+`status=SeqCode` 为键，而不是 `status=valid`（39 339，为 SeqCode 计数的十二倍）。
 
-## 许可条款（了结 DATA_LICENSE 未解决项之一）
+## 许可条款（了结 `DATA_LICENSE` 在 `SeqCode Registry data — resolved 2026-09-25` 一节中记录的那个问题）
 
 逐字摘自 `https://registry.seqco.de/page/api` 页脚，检索于 2026-09-25：
 
@@ -115,8 +118,8 @@ as of 2026-08-16"。2026-09-25 线上实测：`status=public` 48 407，`status=S
 > All information contributed to the SeqCode Registry is released under the
 > terms of the Creative Commons Attribution (CC BY) 4.0 license
 
-因此 `storage/store.py` 与 `corpus_seed.json` 输出的 "SeqCode data: CC-BY 4.0" 署名字符串
-**在许可上是正确的** —— 它现在是引自上游，而不是早期草稿的遗留。CC BY 4.0 只要求署名
+因此 `storage/store.py` 输出的 “SeqCode data: CC-BY 4.0” 署名字符串（`corpus_seed.json` 的
+`_meta.provenance` 亦按该条款登记其许可）**在许可上是正确的**——它现在是引自上游，而不是早期草稿的遗留。CC BY 4.0 只要求署名
 （不含相同方式共享），这比约束 LPSN 衍生资产的 CC BY-SA 4.0 的 copyleft 成分*更少*；
 对再分发意味着什么，见 `DATA_LICENSE`。
 
@@ -125,7 +128,7 @@ rate / limit / throttle / quota 检索过），也未观察到任何限流响应
 `data/rate_limit_budget.json` 无法为 SeqCode 引用一个上游数字；在这个数字存在之前，
 任何抓取都必须自行限流并如实说明。
 
-## 如何重新推出本记录
+## 如何重新推导出本记录
 
 ```bash
 .venv/bin/python scripts/probe_seqcode_api.py          # 重跑上文的每一项探测

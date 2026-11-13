@@ -55,7 +55,7 @@ pytest --collect-only -q         # 权威的按模块测试计数
 **下面这个数字是生成的，不是手写的。** `python scripts/fill_test_counts.py` 写入 `pytest --collect-only` 实际收集到的数量，CI 的 `--verify` 步骤会在它失配时报错。套件覆盖范围：
 
 - 安装 `.[dev]` 后收集 967 项，而且不再分档：本包没有任何模块导入 Qt，因此也没有任何测试被图形扩展组门控。ProkName Studio 的测试随 Studio 一同计数；
-- `tests/test_property.py` 依赖 `hypothesis`；`tests/test_taxonkit_crosscheck.py`（3 项）在所有环境都会被收集，但若 `PATH` 上没有 `taxonkit` 二进制就会被**跳过**——本仓库随附的 CI 镜像并不安装 taxonkit，因此该交叉验证在本项目 CI 中从不运行。
+- `tests/test_property.py` 依赖 `hypothesis`；`tests/test_taxonkit_crosscheck.py`（3 项）在所有环境都会被收集，但若 `PATH` 上没有 `taxonkit` 二进制就会被**跳过**——随包的 CI 镜像并不安装 `taxonkit`，因此该交叉验证在本项目 CI 中从不运行。
 
 以 `pytest --collect-only`（总数）与 `pytest --collect-only -q`（按模块计数）这两条命令为准：本文引用的任何总数都只是快照，而套件仍在增长。
 
@@ -73,7 +73,7 @@ docker run --rm prokname gen --stem Boyd --type person --rank species \
 
 ## 2. 核心概念
 
-prokname 将**词源描述**转化为合规的候选学名，检查命名冲突，并辅助选择正确的**命名法典**。四种词源类型驱动引擎；每种类型映射到一个或两个*语法类别*（映射关系存于 `src/prokname/data/rules.json`，可由专家审阅）：
+prokname 将**词源描述**转化为合规的候选学名，检查命名冲突，并辅助选择正确的**命名法典**。四种词源类型驱动引擎；每种类型映射到种加词的某一个或两个*语法类别*（映射关系存于 `src/prokname/data/rules.json`，可由专家审阅）：
 
 | 词源类型 | `--type` | 语法类别 | 是否随属名性别变格 | 示例 |
 |---|---|---|---|---|
@@ -88,7 +88,7 @@ prokname 将**词源描述**转化为合规的候选学名，检查命名冲突�
 - **推断（inference）**——词尾/词素启发式；输出中**始终**标记 `needs_review`；
 - **未知（unknown）**——无适用规则：引擎拒绝猜测，返回阻断的候选，绝不默认阳性。
 
-**人名种加词是属格名词。** 在 ICNP 下，词尾取决于姓氏**拉丁化成哪个变格范式**，而**不**取决于被纪念者的生理性别，也不只取决于词干末字符。三个范式的对应关系如下：
+**人名种加词是属格名词。** 在 ICNP 下，词尾取决于姓氏**拉丁化成哪个变格范式**，而**不**取决于被纪念者的生理性别，也不只取决于词干末字符。范式与词尾的对应关系如下：
 
 - 第一变格：`-a` → `-ae`。
 - 第二变格：`-ius` 或 `-us` → `-ii`。
@@ -96,16 +96,16 @@ prokname 将**词源描述**转化为合规的候选学名，检查命名冲突�
 
 `person_genitive.json` 因此按范式建模，由范式表、**已证实的姓氏词库**（`boyd → boydii`、`burgdorfer → burgdorferi`、`hensel → henselae`、`gordon → gordonae`）与若干*默认*规则三部分组成。
 
-引擎只在“姓氏已被证实且范式 `verified: true`”时断言合规。默认规则给出的提案一律返回 `needs_review` 与 `compliant=None`。范式也无法推断的姓氏（通常是元音结尾且未被证实）抛出 `GenitiveCellUnavailable`，而不是臆测。把其余 `verified: false` 的范式对照 ICNP 正字法附录与 LPSN 补齐，仍是未完成的 M0 专家事项，见[已知局限](#10-已知局限)。
+引擎只在“姓氏已被证实且范式 `verified: true`”时断言合规。默认规则给出的提案仍会输出，但一律返回 `needs_review` 与 `compliant=None`。范式也无法推断的姓氏（通常是元音结尾且未被证实）抛出 `GenitiveCellUnavailable`，而不是臆测。把其余 `verified: false` 的范式对照 ICNP 正字法附录与 LPSN 补齐，仍是未完成的 M0 专家事项，见[已知局限](#10-已知局限)。
 
-**高阶元名称以型属的属格词干为基底构造。** 法典强制后缀（`family → -aceae`、`order → -ales`、`class → -ia`、`phylum → -ota` 等，含亚阶元）接在型属的**属格单数词干**上，因此要先删除或改写主格词尾。示例如下：
+**更高阶元名称以型属的属格词干为基底构造。** 法典强制后缀（`family → -aceae`、`order → -ales`、`class → -ia`、`phylum → -ota` 等，含亚阶元）接在型属的**属格单数词干**上，因此要先删除或改写主格词尾。示例如下：
 
 - *Bacillus*（属格 *Bacilli*）→ **Bacill** + `-aceae` = `Bacillaceae`。
 - *Clostridium* → *Clostridi-* + `-ales` = `Clostridiales`。
 - *Pseudomonas* → *Pseudomonad-* + `-ota` = `Pseudomonadota`。
 - *Streptomyces*（属格 *Streptomycetis*）→ *Streptomycet-* + `-aceae` = `Streptomycetaceae`。
 
-因此在这些阶元上，`--stem` 的预期输入是**主格属名**。词干取自 `data/type_genus_stems.json`。引擎**只有**在推导出的名称同时收录于该文件的 `attested_higher_rank_names` 时才断言合规。`Escherichiales` 这类“构成规则正确但未见发表”的名称会以 `compliant=None` 加显式警告返回，不会当作已发表名呈现。
+因此在这些阶元上，`--stem` 的预期输入是**主格属名**。词干取自 `data/type_genus_stems.json`。引擎**只有**在推导出的名称同时收录于该文件的 `attested_higher_rank_names` 时才断言合规。`Escherichiales` 这类“构成规则正确但未经证实”的名称会以 `compliant=None` 加显式警告返回，不会当作已发表名呈现。
 
 ---
 
@@ -123,7 +123,7 @@ prokname 将**词源描述**转化为合规的候选学名，检查命名冲突�
 # 人名词源 → 属格名词，与属名性别无关
 prokname gen --stem Boyd --type person --rank species \
     --genus Shigella --person-gender male
-# → Shigella boydii   （属格名词：属名性别无关）
+# → Shigella boydii   （属格名词：与属名性别无关）
 
 # 地名形容词随属名语法性别变格
 prokname gen --stem Beijing --type place --rank species --genus Rhizobium
@@ -135,7 +135,7 @@ prokname gen --stem Beijing --type place --rank species --genus Klebsiella
 prokname gen --stem Wukong --type feature --rank species --genus Bacillus
 # → Bacillus wukongus（形容词）与 Bacillus wukong（同位名词）
 
-# 高阶元把法典强制后缀接在型属的"属格词干"上
+# 更高阶元把法典强制后缀接在型属的“属格词干”上
 # （--stem 传主格属名，见第 2 节）
 prokname gen --stem Bacillus     --type feature --rank family    # Bacillaceae
 prokname gen --stem Bacillus     --type feature --rank order     # Bacillales
@@ -149,23 +149,23 @@ prokname gen --stem Wukong --type feature --rank genus --genus-suffix monas
 # → Wukongomonas（辅音连缀处自动插入连接元音 -o-）
 ```
 
-> 上述高阶元示例有两点保留。(1) **保留名**不会被规则“纠正”：`--stem Bacillus --rank class` 返回带“conserved name”警告的 `Bacilli`，而非常规构成形式 `Bacillia`。(2) 各后缀由哪部法典强制并不统一：`rules.json` 把 `-aceae`/`-ales` 标为 ICNP 强制词尾，把 `-idae`、`-ineae`、`-oideae`、`-eae`、`-inae` 标为“采纳植物学惯例”（亚阶元输出返回 `compliant=None`），把 `phylum → -ota` / `class → -ia` 标为 SeqCode 建议。这些归属仍需专家裁断——见[已知局限](#10-已知局限)。
+> 上述更高阶元示例有两点需要注意。(1) **保留名**不会被规则“纠正”：`--stem Bacillus --rank class` 返回带 `conserved name` 警告的 `Bacilli`，而非常规构成形式 `Bacillia`。(2) 各后缀由哪部法典强制并不统一：`rules.json` 把 `-aceae`/`-ales` 标为 ICNP 强制词尾，把 `-idae`、`-ineae`、`-oideae`、`-eae`、`-inae` 标为“采纳植物学法规惯例”（亚阶元输出返回 `compliant=None`），把 `phylum → -ota` / `class → -ia` 标为 SeqCode 建议。这些归属仍需专家裁断——见[已知局限](#10-已知局限)。
 
 选项：
 
 | 选项 | 取值 | 说明 |
 |---|---|---|
-| `--stem` | 文本（任意文字；音译） | 必填；使用前拉丁化（德语 ü→ue、ä→ae、ö→oe、ß→ss，北欧 ø→oe、å→aa，æ→ae、þ→th、ł→l 等；去连字符；最终转写表待 M0 专家签字） |
+| `--stem` | 文本（任意文字；转写） | 必填；使用前拉丁化（德语 ü→ue、ä→ae、ö→oe、ß→ss，北欧 ø→oe、å→aa，æ→ae、þ→th、ł→l 等；去连字符；最终转写表待 M0 专家签字） |
 | `--type` | `place` \| `person` \| `thing` \| `feature` | 默认 `feature` |
 | `--rank` | `phylum` `class` `subclass` `order` `suborder` `family` `subfamily` `tribe` `subtribe` `genus` `species` `subspecies` | 默认 `species` |
 | `--genus` | 属名或完整双名 | species/subspecies 必填；subspecies 接受双名（`"Bacillus subtilis"`） |
 | `--person-gender` | `male` \| `female` | **被纪念者**的性别（非属名性别）；`person` 必填 |
 | `--gender` | `m` \| `f` \| `n` | 专家复核后覆盖属名性别 |
 | `--genus-suffix` | 如 `monas` | 属名等级的可选建议词尾 |
-| `--adjective-formation` | `place` \| `second_declension` \| `third_declension` \| `loving` \| `nourishing` | 显式指定形容词变格范式 |
+| `--adjective-formation` | `place` \| `second_declension` \| `third_declension` \| `loving` \| `nourishing` | 显式指定形容词范式 |
 | `--json` | 开关 | 机器可读输出 |
 
-每个候选行报告：完整名称、语法类别、属名性别、合规性（`yes` / `no` / `review`）、构词推导与警告。无法安全构造词尾的候选（如缺少 `--person-gender`，或属名性别未知）输出为 `Genus [?]` 并附解释，绝不静默丢弃。
+每个候选行报告：完整名称、语法类别、属名性别、合规性（`yes` / `no` / `review`）、构词推导与警告。无法安全构成种加词的候选（如缺少 `--person-gender`，或属名性别未知）输出为 `Genus [?]` 并附解释，绝不静默丢弃。
 
 ### `prokname check`
 
@@ -184,14 +184,14 @@ prokname check "Some name" --online                   # 查询权威 API（需�
 
 可依赖的行为：
 
-- **默认离线。** 未指定 `--online` 且无凭据/配置时，四个源（LPSN、SeqCode Registry、GNA GNverifier、NCBI）均报告 `unavailable`。
+- **默认离线。** 除非同时给出 `--online` 且存在可用的凭据/配置，否则四个源（LPSN、SeqCode Registry、GNA GNverifier、NCBI）一律报告 `unavailable`。
 - **`unavailable` ≠ `not found`。** 权威源无法查证时，裁定为 `blocked`（退出码 3）：“无法查证”绝不伪装为“未发现”。
 - **参考源只警示。** GNA/NCBI 命中产生 `verify_warning`，绝不做冲突裁定。
 - 本地近似名扫描报告编辑距离在 `--max-distance`（默认 2——经典易混对 `-ensis/-ense` 恰好位于距离 2）内的全部语料条目，并同时报告语料日期与溯源；语料超过 180 天将追加过期警告。随包语料是**带日期的演示语料**：`src/prokname/data/corpus_seed.json` 共 **16** 条（`corpus_date` 2026-08-16；来源标签 LPSN ×12、synthetic-demo ×2、SeqCode Registry ×1、NCBI ×1）。在其上的命中/未命中是**演示**，不是召回率或假阳率测量。
-- **两种扫描口径。**`--near-match-mode whole`（默认）比较整名；`stem` 先剥离屈折词尾再比较（Taxamatch/GNmatcher 思想），词干距离 ≤ 1 即命中——`-ensis/-ense` 这类仅词尾有别的名称在词干空间坍缩为相同词干；`both` 输出两种口径的并集，每个命中保留最小距离。
-- **常规 CI 不联网。** 在线适配器在 `tests/` 中以离线方式验证：桩件化的适配器客户端（见 `tests/test_online_adapters.py`）逐字段钉住上游请求/响应契约，`tests/test_api_fixtures.py` 覆盖离线与降级行为。回放*录制下来的* HTTP 响应（`tests/fixtures/` 下的 VCR 录制带）**目前不属于**常规 CI 环节：`tests/conftest.py` 如实记录了“尚未录制/提交任何 cassette”（录制需要真实 LPSN 凭据）。见[已知局限](#10-已知局限)。
+- **两种扫描口径。** `--near-match-mode whole`（默认）比较完整名称；`stem` 先剥离屈折词尾再比较（Taxamatch/GNmatcher 思想），词干距离 ≤ 1 即命中——`-ensis/-ense` 这类仅词尾有别的名称在词干空间坍缩为相同词干；`both` 输出两种口径的并集，每个命中保留最小距离。
+- **常规 CI 不联网。** 在线适配器在 `tests/` 中以离线方式验证：桩件化的适配器客户端（见 `tests/test_online_adapters.py`）逐字段钉住上游请求/响应契约，`tests/test_api_fixtures.py` 覆盖离线与降级行为。回放*录制下来的* HTTP 响应（`tests/fixtures/` 下的 VCR 录制带）**目前不属于**常规 CI 环节：`tests/conftest.py` 如实记录了“尚未录出任何录制带”（录制需要真实 LPSN 凭据）。见[已知局限](#10-已知局限)。
 
-五种裁定状态：`conflict`、`parahomonym_warning`、`verify_warning`、`blocked`、`no_clear_conflict`。以当前数据源，实际可到达的是 `conflict` 与 `blocked`；其余三种需要两个权威源都能给出答复（见 FAQ）。
+五种裁定状态：`conflict`、`parahomonym_warning`、`verify_warning`、`blocked`、`no_clear_conflict`。在两个权威源都能给出否定答复之前（SeqCode 快照未命中本身就构成硬性阻断，而 LPSN 需要凭据且必须可达，属 M0/M2 事项），实际可到达的只有 `conflict`、`blocked` 以及本地近似名警告（见 FAQ）。
 
 ### `prokname route`
 
@@ -199,13 +199,13 @@ ICNP 与 SeqCode 双法典路由；输出可行路径与利弊对比，绝不强
 
 ```bash
 prokname route --source MAG --icnp-occupied no
-# → SeqCode（唯一可行）：基因组为模式、Registry DOI、质量阈值
+# → SeqCode（唯一可行）：以基因组为模式、Registry DOI、质量阈值
 prokname route --source pure_culture --icnp-occupied no
 # → ICNP（默认：IJSEM + 模式菌株保藏）与 SeqCode（替代路径）双双列出
 prokname route --source MAG --icnp-occupied yes
 # → 冲突引导：SeqCode 承认 ICNP 优先权
 prokname route --source MAG --candidatus
-# → 仅 SeqCode 可行 + Candidatus 格式规则
+# → SeqCode 唯一可行 + Candidatus 格式规则
 ```
 
 | 选项 | 取值 | 说明 |
@@ -245,24 +245,23 @@ prokname project delete my-paper
 
 说明：
 
-- `add` 与 `prokname gen` 走同一生成管线（人名词源需传 `--person-gender`），并将全部生成候选追加进项目；词源参数非法时以退出码 1 报错。
+- `add` 与 `prokname gen` 走同一生成管线（人名词源需传 `--person-gender`），并将全部生成候选追加进项目；词源参数非法时以退出码 1 报错，并给出引擎的错误信息。
 - `rate` 将分数截断到 0～5；项目或候选不存在时退出码 1。
 - `export --format` 仅接受 `json`、`csv`、`markdown`；其他取值以退出码 1 报错，绝不静默回退为 JSON。
-- 项目名可含空格；磁盘文件名附加碰撞保护后缀，`my paper` 与 `my_project` 仍是两个独立项目。项目文件损坏时报明确错误（`ProjectLoadError`），不会伪装成“项目不存在”。
+- 项目名可含空格；磁盘文件名附加碰撞保护后缀，`my paper` 与 `my_paper` 仍是两个独立项目。项目文件损坏时报明确错误（`ProjectLoadError`），不会伪装成“项目不存在”。
 - 导出均标注：工具版本、导出时间戳、免责声明，以及代码原样写出的数据署名字符串（“LPSN data: CC BY-SA 4.0”与“SeqCode data: CC-BY 4.0”）。
-  - 权威许可文本 `DATA_LICENSE` 目前**只授予两项条款**：LPSN 衍生部分为 CC BY-SA 4.0，自研规则文件为 CC0 1.0。
-  - `DATA_LICENSE` 中**没有** SeqCode 衍生条款，其再分发条款在状态说明里列为待澄清问题，见[数据资产与许可](#7-数据资产与许可)。
-- Markdown 导出还会为每个候选附带一张 **SeqCode Registry 风格的 etymology 草表**。整词与语法依存储的推导信息预填，词素行刻意留空，由作者补全。prokname 绝不臆造未被告知的词源。
+  - 权威许可文本 `DATA_LICENSE` **授予三项条款**：LPSN 衍生部分为 CC BY-SA 4.0（署名与相同方式共享）、自研规则文件为 CC0 1.0、SeqCode Registry 快照为 CC BY 4.0；其中 SeqCode 衍生条款原先被列为待澄清问题，已于 2026-09-25 了结，见[数据资产与许可](#7-数据资产与许可)。
+- Markdown 导出还会为每个候选附带一张 **SeqCode Registry 词源（etymology）草表**。整词与语法依存储的推导信息预填，词素行刻意留空，由作者补全。prokname 绝不臆造未被告知的词源。
 
 ### `prokname bench` / `prokname holdout`
 
 ```bash
-prokname bench            # 引擎内置回归种子（25 个实名锚定用例）
+prokname bench            # 引擎内置回归种子（51 个实名锚定用例：validate 29 + generate 14 + gender 8）
 prokname bench --full     # A/B1/B2/C/D 基准套件（含基线与自助法置信区间）
-prokname holdout          # CI 门禁：A-"推断"子集 ∩ 已发布词库必须为空
+prokname holdout          # CI 门控：A-INFERENCE 子集 ∩ 已发布词库必须为空
 ```
 
-`prokname holdout` 只强制一件事（`src/prokname/benchmark/holdout.py`）：A-**推断**子集中的任何属名都不得经词库命中。它**不**要求、也不应要求 `genus_gender.json ∩ A-set = ∅`：出现在 A **查找**子集里的 15 个词库属**本就应在词库中**（查找覆盖率正是拿它们度量的），因此完整 A 集与词库相交是设计使然。请勿靠删词库条目或删查找判例去“修”这个相交。
+`prokname holdout` 只强制一件事（`src/prokname/benchmark/holdout.py`）：A-**推断**子集中的任何属名都不得经词库命中。它**不**要求、也绝**不应**要求 `genus_gender.json ∩ A-set = ∅`：出现在 A **查找**子集里的 15 个词库属**本就应在词库中**（查找覆盖率正是拿它们度量的），因此完整 A 集与词库相交是设计使然。请勿靠删词库条目或删查找用例去“修”这个相交。
 
 `bench --full` 逐套报告以下内容：
 
@@ -272,12 +271,12 @@ prokname holdout          # CI 门禁：A-"推断"子集 ∩ 已发布词库必�
 - D：路由准确率与 ICNP 先占子类，目标为 100%。
 - C：框架报告。它以 `skip_gan=True` 运行，即只跑 prokname 一侧，**与 `gan` 的双边对比从未执行**。
 
-该命令同时是 **CI 门禁**：留出检查失败、B1 漏报率超标或 D 集先占子类未达 100% 时，以退出码 1 结束。每个结果同时携带拒绝感知准确率（含独立置信区间）：对真正未知的属，诚实的 `needs_review` 拒猜计为**正确**，拒不臆测正是设计行为。自助法区间是对“逐例是否正确”向量做的准确度区间，**不是** macro-F1 的区间，在全对样本上会坍缩为一点，见[已知局限](#10-已知局限)。
+该命令同时是 **CI 门控**：被**违反**的门控（留出检查失败、D 集先占子类未达 100%）以退出码 1 结束；而随包种子无法检验的门控（B1 漏报率目标）作为证据欠账上报，只在 `--require-complete`（里程碑模式）下才失败。每个结果同时携带拒绝感知准确率（含其独立的自助法置信区间）：对真正未知的属，诚实的 `needs_review` 拒猜计为**正确**，拒不臆测正是设计行为。自助法区间是对“逐例是否正确”向量做的准确度区间，**不是** macro-F1 的区间，在全对样本上会坍缩为一点，见[已知局限](#10-已知局限)。
 
 ### `prokname data`
 
 ```bash
-prokname data          # 每个打包数据资产的版本 + 门控状态
+prokname data          # 每个随包数据资产的版本 + 门控状态
 prokname data --json
 ```
 
@@ -293,21 +292,33 @@ prokname config --clear                                # 清除已保存路径
 prokname config --json
 ```
 
-持久化路径写入 `~/.config/prokname/config.json`，跨调用生效；环境变量优先。密码绝不写入配置文件——LPSN 凭据应存入系统钥匙串（服务名 `prokname`）或 `PROKNAME_LPSN_USER` / `PROKNAME_LPSN_PASSWORD` 环境变量。LPSN API 免费注册： <https://api.lpsn.dsmz.de/>。
+持久化路径写入 `~/.config/prokname/config.json`，跨调用生效；环境变量优先。密码绝不写入配置文件——LPSN 凭据应存入系统钥匙串（服务名 `prokname`）或 `PROKNAME_LPSN_USER` / `PROKNAME_LPSN_PASSWORD` 环境变量。LPSN API 免费注册：<https://api.lpsn.dsmz.de/>。
 
 ### ProkName Studio
 
-桌面前端已是独立项目：**ProkName Studio**，安装名为 `prokname-studio`，中英双语界面、亮暗两套外观。它像其他使用方一样依赖本包，不新增任何命名逻辑——界面上每个结果都来自上文所述的那套 API。安装与启动方式见其[仓库](https://github.com/ZengZichao/ProkName-Studio)；该项目 `docs/STUDIO_PLAN.md` 记录它的设计与里程碑。
+桌面前端已是独立项目：**ProkName Studio**，安装名为 `prokname-studio`，中英双语界面、亮暗两套外观。它像其他使用方一样依赖本包，不新增任何命名逻辑——界面上每个结果都来自上文所述的那套 API。安装与启动方式见其[仓库](https://github.com/ZengZichao/ProkName-Studio)；该项目 `docs/STUDIO_PLAN.md` 记录它的设计。
 
 从本包这一侧看，成立的事实是：
 
 - Studio 与 `prokname project` 使用同一个 `ProjectStore`，因此在任一入口建的项目在另一入口照样打开。
 - Studio 不联网。上文为 `check` 描述的离线边界，就是图形界面报告的边界——没有 LPSN 凭据时哪些结论仍然不可达，两边一致。
-- 两个入口的配色都经由 `prokname.presentation.decision`，因此“已阻塞”不可能在某个窗口里显得紧急、在另一个窗口里显得平静。
+- 两个入口的配色都经由 `prokname.presentation.decision`，因此“已阻断”不可能在某个窗口里显得紧急、在另一个窗口里显得平静。
 
 ---
 
 ## 4. 退出码与输出模式
+
+### 各裁定在操作上的含义
+
+| 裁定 | 退出码 | 说明 | 并不说明 |
+|---|---|---|---|
+| `conflict` | 4 | 某个权威源认定该名称已被占用 | 该名称已有效发表——有效性由法典裁断，不由本工具裁断 |
+| `blocked` | 3 | 权威源无法查证，或答复无法归类 | “这个名字还空着” |
+| `verify_warning` | 0 | 权威源没有给出可据以裁定的结果，但参考源标记了使用情况 | “可以使用” |
+| `parahomonym_warning` | 0 | 在你设定的编辑距离内存在近似名 | 冲突；另见语料规模警告 |
+| `no_clear_conflict` | 0 | 两个权威源都已答复，且都未占用该名称 | 有效性；而且该裁定迄今无法端到端到达 |
+
+最后两行走的是与测试相同的代码路径——测试用一对桩件权威源来驱动它们；以今天的在线数据源，`check` 只会返回 `conflict` 或 `blocked`。`--debug` 会把通常被吞掉的第三方客户端输出打印到 stderr，便于你区分“答复是未找到”与“请求从未成功”；它不改变任何裁定，也不改变退出码。
 
 | 退出码 | 含义 |
 |---|---|
@@ -315,7 +326,9 @@ prokname config --json
 | `1` | 命令自身处理的运行时错误（非法输入、项目缺失、项目文件损坏等） |
 | `2` | CLI 框架抛出的用法/参数错误（未知选项、缺少必填项、取值越界） |
 | `3` | `check` 裁定：blocked——权威源不可用，**或答复无法据以裁定**（`found_unknown`）；本地近似名命中会以警告并列展示，绝不升格为裁定（见 FAQ） |
-| `4` | `check` 裁定：conflict——权威源报告该名称已存在 |
+| `4` | `check` 裁定：conflict——权威源报告该名称已被占用 |
+
+只有 `3` 与 `4` 这两个 `check` 裁定是非零退出码，也只有 `4` 意味着“已被占用”。两种警告裁定与“无明确冲突”都退出 `0`——“已查证，但带有保留意见”本身就是成功——因此脚本必须读取裁定，不能只看退出码。当前数据源实际能产出哪些裁定，见 FAQ。
 
 退出码 2 属于 CLI 框架本身（typer/click 惯例），因此 conflict 裁定刻意使用 **4**：管线仅凭退出码即可区分“参数打错了”和“名称已被占用”。
 
@@ -323,15 +336,32 @@ prokname config --json
 
 ---
 
+### 维护随包分发的数据快照
+
+有两个资产派生自在线服务，按设计就会过期：
+
+```bash
+python scripts/build_seqcode_snapshot.py     # SeqCode 占用清单（112+ 页）
+python scripts/record_live_gna.py            # GNA 契约录制（无需凭据）
+python scripts/record_live_gna.py --check    # 检测上游 schema 漂移
+python scripts/probe_seqcode_api.py          # 重新推导 SeqCode 端点记录
+python scripts/rebuild_corpus.py             # 近似名语料（需 LPSN 凭据）
+```
+
+在磁盘上替换某个资产之后，`prokname.reload_data()` 会在进程内直接应用它——无需重启，且全部派生索引随之丢弃。资产以只读方式返回，因此试图写入某个资产的调用方会在出错的那一行拿到 `TypeError`，而不会静默地为整个进程改写规则。`prokname data` 报告每个资产的版本、由谁消费（包括那些已经无人读取的资产），以及其中有多少断言仍在等待专家核验。
+
+---
+
 ## 5. Python API
 
 ```python
-from prokname.engine import generate_candidates, validate_agreement, gender_of, Gender
+from prokname.engine.generate import generate
+from prokname.engine import validate_agreement, gender_of, Gender
 from prokname.routing import route
 from prokname.dedup import check_name
 
 # 1. 生成候选
-candidates = generate_candidates(
+candidates = generate(
     "Beijing", "place", "species", genus="Klebsiella")
 for c in candidates:
     print(c.name, c.grammatical_category, c.compliant, c.warnings)
@@ -375,7 +405,7 @@ print(report.verdict, [s.status for s in report.sources])
 
 复现方式：`prokname bench --full --json > results.json`。留出门控（`prokname holdout`）强制 **A 推断子集**与已发布词库不相交。A 查找子集里那 15 个词库属按设计就是相交的，见 [`prokname bench`、`prokname holdout`](#prokname-bench--prokname-holdout)。
 
-2026-09-04 扩充新增的用例一律标注 `curated-seed`。“待 M0 LPSN API 批量核验”这条显式注记只在 `a_set.json` 中逐例携带（55 例），其余套件在文件级 `_meta.expanded` 携带，并非每个套件的每个用例都带该注记。升级为 LPSN 衍生、留出控制的论文级集合（不少于 1,920 例）属于 M1/M2 交付物。
+2026-09-04 扩充新增的用例一律标注 `curated-seed`。“待 M0 LPSN API 批量核验”这条显式注记只在 `a_set.json` 中逐例携带（55 例），其余套件在文件级 `_meta.expanded` 携带，并非每个套件的每个用例都带该注记。升级为 LPSN 衍生、留出集受控的论文级集合（不少于 1 920 例）属于 M1/M2 交付物。
 
 `bench --full` 报告的置信区间是对“逐例是否正确”向量做的**自助法**准确度区间，不是 macro-F1 的区间，在全对样本上会坍缩为一点。小样本的精确二项界限见[已知局限](#10-已知局限)。
 
@@ -386,22 +416,22 @@ print(report.verdict, [s.status for s in report.sources])
 | 资产 | 用途 | 状态 |
 |---|---|---|
 | `rules.json` | 阶元后缀、形容词范式、类型→类别映射 | M0 草案，待专家签字 |
-| `person_genitive.json` | 拉丁化变格范式表 + 已证实姓氏词库 + 默认规则 | 仅“已证实且 verified:true”的条目可断言合规；默认规则一律 `needs_review`；3 个范式 `verified: false` |
-| `genus_gender.json` | 查找词库（**58** 个策展属：23 f / 20 m / 15 n） | 人工策展种子 |
-| `type_genus_stems.json` | 型属属格词干 + 已证实的超属级名称（用于高阶元推导） | M0 草案；驱动“未见证实即 `compliant=None`”的门控 |
+| `person_genitive.json` | 拉丁化变格范式表 + 已证实姓氏词库 + 默认规则 | 仅“已证实且 verified:true”的条目可断言合规；默认规则一律 `needs_review`；5 个范式中有 2 个（`first_declension_ia`、`third_declension_consonant`）标注 `verified: false`，`defaults` 下 4 条默认规则也全部 `verified: false` |
+| `genus_gender.json` | 查找词库（**58** 个人工整理的属：23 f / 20 m / 15 n） | 人工整理的种子 |
+| `type_genus_stems.json` | 型属属格词干 + 已证实的超属级名称（用于更高阶元推导） | M0 草案；驱动“未经证实即 `compliant=None`”的门控 |
 | `gender_endings.json` | 推断启发式（词素 → 例外 → 一般词尾） | 启发式，始终 `needs_review` |
 | `stems.json` | 用户可扩展的词干库 | 示例种子（尚未接入 CLI） |
 | `corpus_seed.json` | 近似名**演示**语料：16 条，`corpus_date` 2026-08-16（LPSN ×12、synthetic-demo ×2、SeqCode Registry ×1、NCBI ×1） | 仅测试/演示 |
-| `lpsn_status.json` | 可专家审阅的 LPSN `lpsn_taxonomic_status` 标签→类别映射（取代旧的子串判定） | 由 `dedup/lpsn.py` 消费；`prokname data` 尚未列出该资产 |
+| `lpsn_status.json` | 可专家审阅的 LPSN `lpsn_taxonomic_status` 标签→类别映射（取代旧的子串判定） | 由 `dedup/lpsn.py` 消费；`prokname data` 已列出该资产 |
 | `rate_limit_budget.json` | 语料重建的 API 限流预算表 | M2 交付项 |
 
-`prokname data` 报告的是经 `engine/data.py::asset_status()` 接线的八个资产；`lpsn_status.json` 由 LPSN 适配器直接加载，因此不在该清单中。
+`prokname data` 报告的是经 `engine/data.py::asset_status()` 接线的十个资产：上表九项，加上 SeqCode 占用快照 `seqcode_registered.json`。
 
 58（词库规模）与 59（A 推断子集规模）是两个互不相关的计数；A 集本身为 74 = 15 查找 + 59 推断。
 
-**数据许可以 `DATA_LICENSE` 为唯一权威文本，它只授予两项条款：** LPSN 衍生部分为 CC BY-SA 4.0（署名与相同方式共享），自研规则文件（`rules.json`、`gender_endings.json`、`person_genitive.json`、`stems.json`）为 CC0 1.0。代码本身为 MIT（`LICENSE`）。
+**数据许可以 `DATA_LICENSE` 为唯一权威文本，它只授予三项条款：** LPSN 衍生部分为 CC BY-SA 4.0（署名与相同方式共享），自研规则文件（`rules.json`、`gender_endings.json`、`person_genitive.json`、`stems.json`）为 CC0 1.0，SeqCode Registry 快照（`seqcode_registered.json`）为 CC BY 4.0——最后一条引自注册中心自己的页面，并记录了 2026-09-25 的检索日期。代码本身为 MIT（`LICENSE`）。
 
-`DATA_LICENSE` 中**没有** SeqCode 衍生条款。`storage/store.py` 写出的“SeqCode data: CC-BY 4.0”与 `corpus_seed.json` 的 `_meta.provenance` 只是散文表述，不构成已授予的许可。SeqCode 衍生数据的再分发条款已在 `DATA_LICENSE` 的状态说明里列为待澄清问题。
+`storage/store.py` 写出的“SeqCode data: CC-BY 4.0”与 `corpus_seed.json` 的 `_meta.provenance` 因此指向一项已授予的许可，而不只是散文表述。`DATA_LICENSE` 仍未了结的是：相同方式共享义务对我们自有衍生资产的含义、混合来源规则资产在再发布之前必须完成的逐格来源审计（其中 `type_genus_stems.json` 与 `lpsn_status.json` 两个随包资产未被任何小节列举，审计完成前不得改按 CC0）、发布物若在包外单独再分发该快照是否需向 SeqCode Initiative 确认，以及欧盟的 sui generis 数据库权问题。
 
 所有导出与 JSON 输出仍携带上述署名字符串，请把它理解为对上游来源的署名。再发布衍生资产之前，先重新核读 `DATA_LICENSE` 的状态说明。
 
@@ -429,16 +459,16 @@ print(report.verdict, [s.status for s in report.sources])
 
 **`import prokname` 能导入但没有 `__version__`，`prokname.cli` 找不到** editable `.pth` 指向不存在的路径，Python 回退到遗留 `site-packages/prokname` 目录形成的命名空间包。重装（`pip install -e ".[dev]"`）或重建虚拟环境。
 
-**`gen` 输出候选为 `Genus [?]` **引擎无法安全构造词尾：`person` 词源需传 `--person-gender`；属名性别未知时专家复核后传 `--gender m|f|n`。这是刻意设计——见[核心概念](#2-核心概念)。
+**`gen` 输出的候选是 `Genus [?]`** 引擎无法安全构成加词：`person` 词源需传 `--person-gender`；未知属名上的形容词则需经专家复核后传 `--gender m|f|n`。这是刻意设计——见[核心概念](#2-核心概念)。
 
-**`check` 对未被占用的名字退出码 3（blocked）。** 两件事同时成立，且都来自实测：（1）`4`（冲突）可达，且自 2026-09-25 起覆盖面更大——SeqCode 适配器改依带日期的占用快照裁定，凡在 SeqCode 下已注册并有效发表的名字，即使完全离线也判为冲突；（2）其余情形返回 `3`，因为目前没有任何权威源能回答“没有”——SeqCode 公开 API 无按名字查询，且实测其 `status=SeqCode` 列表会漏掉注册中心自己标注为 `Valid (SeqCode)` 的名字，因此“不在列表里”不等于“注册中心里没有”，适配器有意返回 `found_unknown` 并阻断裁定；LPSN 本可定论，但需凭据且必须可达。请把 `3` 读作“工具没能问到”，绝不是“这个名字没问题”。本地近似名命中仍以警告形式并列展示，不会静默丢弃。离线模式下所有权威源报告 `unavailable`，按设计阻断裁定。
+**`check` 对未被占用的名字退出码 3（blocked）。** 两件事同时成立，且都来自实测：（1）**`4`（冲突）可达，而且自 2026-09-25 起覆盖面更大**——SeqCode 适配器改依带日期的占用快照裁定，凡在 SeqCode 下已注册并有效发表的名字，即使完全离线也判为冲突；（2）**其余情形都返回 `3`，因为目前没有任何权威源能回答“没有”**——SeqCode 公开 API 无按名字查询，且实测其 `status=SeqCode` 列表会漏掉注册中心自己标注为 `Valid (SeqCode)` 的名字，因此“不在列表里”不等于“注册中心里没有”，`dedup/seqcode.py` 有意返回 `found_unknown` 并阻断裁定；LPSN 本可定论，但需凭据且必须可达。请把 `3` 读作“工具没能问到”，绝不是“这个名字没问题”。中间裁定态（带警告的 `0`、判为“无明确冲突”的 `0`、近似名（parahomonym）警告）只有在两个权威源都能给出否定答复之后才可端到端到达，实时录制清单见 `tests/fixtures/manifest.json`。本地近似名命中仍以警告形式与 `3` 并列展示。离线模式下所有权威源报告 `unavailable`，按设计阻断裁定。
 
 如需获得裁定结果，有两种做法：
 
 - 安装可选的 online 扩展组（`pip install -e ".[online]"`，含官方 `lpsn` 客户端、`httpx` 与 `keyring`），存好凭据（keyring，或 `PROKNAME_LPSN_USER` 与 `PROKNAME_LPSN_PASSWORD`），再用 `--online` 运行。
 - 在明知权威源未查证的前提下解读本地近似名结果。
 
-**人名属格抛出 `GenitiveCellUnavailable` **该姓氏既未在 `person_genitive.json` 中被证实，也没有任何有记录的默认规则能覆盖它——通常是因为姓氏以元音结尾，其拉丁化范式无法从拼写推断。相关默认范式格子按设计保持 `verified: false`，待 M0 对照 ICNP 正字法附录由专家签字。引擎拒绝臆测。
+**人名属格抛出 `GenitiveCellUnavailable`** 该姓氏既未在 `person_genitive.json` 中被证实，也没有任何有记录的默认规则能覆盖它——通常是因为姓氏以元音结尾，其拉丁化范式无法从拼写推断。相关默认范式格子按设计保持 `verified: false`，待 M0 对照 ICNP 正字法附录由专家签字。引擎拒绝臆测。
 
 **支持 GTDB 标签吗？**不支持——GTDB 占位标签不是 ICNP 或 SeqCode 下的名称，按设计既不解析也不映射。
 
@@ -448,15 +478,15 @@ print(report.verdict, [s.status for s in report.sources])
 
 以下为本仓库当前**真实**能证明的边界，逐条都是种子数据的属性，不是使用不当。
 
-- **仅为种子规模的基准。** A 74 / B1 26 / B2 17 / C 5×3 / D 11 例。所有“1.00”都是小样本全对：精确（Clopper–Pearson）95% 置信区间分别为 B1（26/26）[0.87, 1.00]、B2（17/17）[0.80, 1.00]、D（11/11） [0.72, 1.00]、D 先占子类（3/3）[0.29, 1.00]——3/3 不足以支撑“达成 100% 目标”。`bench --full` 打印的自助法区间是准确度区间，在全对样本上坍缩为一点。
+- **仅为种子规模的基准。** A 74 / B1 26 / B2 17 / C 5×3 / D 11 例。所有“1.00”都是小样本全对：精确（Clopper–Pearson）95% 置信区间分别为 B1（26/26）[0.87, 1.00]、B2（17/17）[0.80, 1.00]、D（11/11）[0.72, 1.00]、D 先占子类（3/3）[0.29, 1.00]——3/3 不足以支撑“达成 100% 目标”。`bench --full` 打印的自助法区间是准确度区间，在全对样本上坍缩为一点。
 - **B1 的“漏报率 ≤ 1%”目标在当前数据下不可检验。** B1 只有 **4** 例负例，且集中在四条词源支中的两条（person 2、place 2、**feature 0、thing 0**）；0/4 的单侧 95% 上界为 **52.7%**，而没有负样本的分支根本不受该门控约束。
-- **标注来源为自标注。** 基准集里 annotator 只有 `seed` 与 `curated-seed` 两种取值：没有独立标注者，也没有标注者间一致性度量。
-- **专家签字尚未完成（M0）。**`rules.json`、`person_genitive.json` 与转写表均标注 M0 草案；依赖它们的结论只能表述为“可由专家审阅、待签字”，而非“已核验”。
-- **高阶元后缀→法典的归属需要专家裁断。**`rules.json` 现在已为每个超属级后缀标注强度（`rank_suffix_policy`：`-aceae`/`-ales` 为 ICNP 强制，`-ota`/`-ia` 为 SeqCode 建议，`-idae`/`-ineae`/`-oideae`/`-eae`/`-inae` 为采纳植物学惯例），引擎也拒绝对“采纳惯例”级阶元断言合规。但 `rules.json` 仍把这些归属本身及其条款引证标注为 `verified: false`（`rule_citation_status`），因此“哪个后缀由哪部法典强制”仍是专家问题而非既定结论；`conserved_names` 只列 16 个保留名，远少于法规附录所列。
-- **近似名语料是 16 条演示集**（`corpus_seed.json`，`corpus_date` 2026-08-16；LPSN ×12、synthetic-demo ×2、SeqCode Registry ×1、NCBI ×1）。未在其上测量假阳率、召回率或阈值敏感性；`Wukomonas` 是演示用虚构属名。
-- **C 集对比从未运行。**`bench --full` 以 `skip_gan=True` 评估 C 套件；gan CLI 适配器与公平性协议存在但不产出任何对比数字，CI 也不安装 gan。
-- **录制的 HTTP 回放在常规 CI 中不存在。** 在线适配器由离线桩件客户端钉住；在 `tests/fixtures/` 下录制 cassette 需要真实 LPSN 凭据，属 M0/M2 事项（`tests/conftest.py` 已如实说明）。
-- **taxonkit 交叉验证门控是 opt-in，且随包 CI 镜像会跳过**：CI 只装 `.[dev]`，不安装 `taxonkit` 二进制；这 3 项测试收集后立即跳过，除非使用方自备该二进制。
-- **`check` 目前只能出具两种裁定。** 冲突（4）与阻塞（3）；中间裁定态要等 LPSN 能给出否定答复，SeqCode 侧还缺一个完整且稳定的名单（或按名字查询的端点）。
+- **标注来源为自标注。** 基准集里 annotator 只有 `seed` 与 `curated-seed` 两种取值：没有第三方标注者，也没有标注者间一致性度量。
+- **专家签字尚未完成（M0）。** `rules.json`、`person_genitive.json` 与转写表均标注 M0 草案；依赖它们的结论只能表述为“可由专家审阅、待签字”，而非“已核验”。
+- **更高阶元后缀→法典的归属需要专家裁断。** `rules.json` 现在已为每个超属级后缀标注强度（`rank_suffix_policy`：`-aceae`/`-ales` 为 ICNP 强制，`-ota`/`-ia` 为 SeqCode 建议，`-idae`/`-ineae`/`-oideae`/`-eae`/`-inae` 为采纳植物学法规惯例），引擎也拒绝对“采纳惯例”级阶元断言合规。但 `rules.json` 仍把这些归属本身及其条款引证标注为 `verified: false`（`rule_citation_status`），因此“哪个后缀由哪部法典强制”仍是专家问题而非既定结论；`conserved_names` 只列 16 个保留名，远少于法规附录所列。
+- **近似名语料是 16 条演示语料**（`corpus_seed.json`，`corpus_date` 2026-08-16；LPSN ×12、synthetic-demo ×2、SeqCode Registry ×1、NCBI ×1）。未在其上测量假阳率、召回率或阈值敏感性；`Wukomonas` 是演示用虚构属名。
+- **C 集对比从未运行。** `bench --full` 以 `skip_gan=True` 评估 C 套件；gan CLI 适配器与公平性协议存在但不产出任何对比数字，CI 也不安装 gan。
+- **录制的 HTTP 回放在常规 CI 中不存在。** 在线适配器由离线桩件客户端钉住；在 `tests/fixtures/` 下录出录制带需要真实 LPSN 凭据，属 M0/M2 事项（`tests/conftest.py` 已如实说明）。
+- **`taxonkit` 交叉验证门控是 opt-in，且随包 CI 镜像会跳过**：CI 只装 `.[dev]`，不安装 `taxonkit` 二进制；这 3 项测试收集后立即跳过，除非使用方自备该二进制。
+- **`check` 今天在真实使用中无法为名称放行。** 没有任何权威源能答复“没有冲突”，因此实际检查只会退出 3（blocked）或 4（conflict）。
 
-English version: [USAGE.md §10](USAGE.md#10-known-limitations)。
+英文版本见 [USAGE.md §10](USAGE.md#10-known-limitations)。

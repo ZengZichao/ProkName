@@ -88,7 +88,7 @@ The CLI registers **eight** commands (`gen`, `check`, `route`, `project`,
 machine-readable output. Exit codes:
 `0` ok/warnings · `1` error · `2` usage error (CLI framework) ·
 `3` blocked (an authority could not rule; local near-match hits listed as
-warnings) · `4` conflict (an authority reports the name).
+warnings) · `4` conflict (an authority reports the name as occupied).
 
 **What `check` can answer today.** `4` (conflict) is reachable and became more so
 on 2026-09-25, when the SeqCode adapter started ruling from a dated occupancy
@@ -98,9 +98,10 @@ returns, and that is a measured limit rather than an untested placeholder — th
 SeqCode Registry's public API has no lookup-by-name, and its `status=SeqCode`
 list provably omits names that the Registry itself marks valid, so absence there
 cannot be read as "free" (docs/provenance/seqcode-registry-2026-09-25.md).
-`0` with a warning, and `0` for "no clear conflict", need BOTH authorities to
-answer negatively; LPSN can, once it is reachable with credentials, so these
-three verdicts stay unreachable end-to-end until that recording exists. Read `3`
+`0` with a warning, `0` for "no clear conflict", and the parahomonym warning
+all need BOTH authorities to answer negatively; LPSN can, once it is reachable
+with credentials, so these three verdicts stay unreachable end-to-end until that
+recording exists. Read `3`
 as "the tool could not ask", never as "the name is fine".
 ("Wukomonas" is an illustrative, synthetic genus, not a published name.)
 
@@ -136,15 +137,19 @@ as "the tool could not ask", never as "the name is fine".
   from a running service — `gna_verifications_live.json`, recorded by
   `scripts/record_live_gna.py` (GNA needs no credentials) and re-checked for
   upstream drift by the scheduled live-smoke job. LPSN (credentials) and the
-  SeqCode REST contract are still unrecorded, so the authority tier is not
+  SeqCode REST contract still have no live-capture fixture, so the authority tier is not
   live-verified and `manifest.json` says exactly which is which.
 - **Data licensing follows `DATA_LICENSE`**: code MIT (`LICENSE`);
   LPSN-derived data CC BY-SA 4.0 (attribution + ShareAlike); hand-built rule
   files CC0 1.0; SeqCode Registry data CC BY 4.0, quoted from the Registry's
   own API page on 2026-09-25 — so the "SeqCode data: CC-BY 4.0" attribution
   some exports emit is now backed by the source instead of carried over from a
-  draft. Two licence questions stay open there and are listed as such: the
-  cell-level derivation audit of the mixed rule assets, and whether the EU
+  draft. Several licence questions stay open there and are listed as such: what
+  CC BY-SA ShareAlike implies for our own derived assets, the cell-level
+  derivation audit of the mixed rule assets before any of them is mirrored into
+  a public dataset or release archive (two shipped assets, `type_genus_stems.json`
+  and `lpsn_status.json`, are not enumerated by any section there and must not be
+  re-licensed as CC0 until that audit exists), and whether the EU sui generis
   database right is engaged by redistributing the full SeqCode name list.
 
 ## Development
@@ -152,9 +157,9 @@ as "the tool could not ask", never as "the name is fine".
 ```bash
 pytest                           # everything this environment collects
 pytest --collect-only -q         # authoritative per-module test counts
-ruff check src scripts tests     # lint gate (CI-enforced)
+ruff check src scripts tests conftest.py  # lint gate (CI-enforced)
 prokname bench                   # built-in real-name anchored regression seed
-prokname bench --full            # seed benchmark A/B1/B2/C/D, gated (exit 1 on miss)
+prokname bench --full            # seed benchmark A/B1/B2/C/D, gated (exit 1 on a violated gate)
 prokname holdout                 # CI gate: A-INFERENCE subset ∩ lexicon = ∅
 ```
 
@@ -162,8 +167,8 @@ The number below is generated, not typed: `python scripts/fill_test_counts.py`
 writes what `pytest --collect-only` actually collects, and CI fails when it goes
 stale (`pytest --collect-only -q` gives the per-module counts behind it).
 
-- This repository's own suite collects 967 tests, with no
-  optional extra installed. ProkName Studio's suite lives with Studio and is
+- This repository's own suite collects 967 tests with `.[dev]`
+  installed. ProkName Studio's suite lives with Studio and is
   counted there; nothing here is gated on Qt, because nothing here imports it.
 - The 3 `taxonkit` cross-check tests are collected everywhere but skipped
   unless that binary is on `PATH`: `.github/workflows/ci.yml` has no `taxonkit`

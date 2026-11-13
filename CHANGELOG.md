@@ -90,11 +90,11 @@ share is the presentation policy described below.
     distinguishable, and the client's stdout is captured so `--json` stays clean.
   - *SeqCode* rules offline from a dated occupancy snapshot built by
     `scripts/build_seqcode_snapshot.py`, so a name registered as validly published under
-    SeqCode produces `conflict` with no credentials and no network. A **miss is not a
-    ruling**: the list was measured to omit names whose own record says
-    `status_name: "Valid (SeqCode)"`, and two identical crawls disagreed on ~4 % of
-    their contents, so absence returns `found_unknown`, which blocks adjudication exactly
-    like an unreachable authority.
+    SeqCode produces `conflict` (exit code 4) with no credentials and no network. A
+    **miss is not a ruling**: the `status=SeqCode` list was measured to omit names whose
+    own record says `status_name: "Valid (SeqCode)"`, and two identical crawls disagreed
+    on ~4 % of their contents, so absence returns `found_unknown`, which blocks
+    adjudication exactly like an unreachable authority.
   - *GNA* follows the current GNverifier REST contract (POST with a JSON body,
     `bestResult` / `matchedName` / `isSynonym` / `editDistance`), with a genuine live
     capture recorded as a replay fixture.
@@ -127,7 +127,7 @@ share is the presentation policy described below.
   `ProjectLoadError` instead of a raw `KeyError`/`TypeError`.
 - JSON writes go through a shared atomic-write helper, and cache and project filenames
   carry a short hash of the raw name, so `Bacillus subtilis` and `Bacillus_subtilis`
-  — or `my paper` and `my_project` — no longer collide.
+  — or `my project` and `my_project` — no longer collide.
 - Exports (JSON / CSV / Markdown) always carry the compliance disclaimer and the
   LPSN / SeqCode attribution; the stored check verdict travels with the candidate;
   `--format` is validated instead of silently emitting JSON under another name; and the
@@ -153,9 +153,10 @@ share is the presentation policy described below.
   fails only under `--require-complete`, the milestone mode. Nothing is certified by
   silence: the line prints as `b1_fnr=pass(NOT CERTIFIED)` and the JSON says so too.
 - **Holdout integrity check** (`prokname holdout`) normalises genus names exactly as the
-  engine does, so a diacritic-spelled genus cannot slip past the disjointness gate; the
-  invariant is the A-inference subset against the published lexicon, and the lexicon
-  genera in the A lookup subset overlap by design.
+  engine does (transliteration + capitalisation), so a diacritic-spelled genus cannot slip
+  past the disjointness gate; the invariant is the A-inference subset against the
+  published lexicon, and the 15 lexicon genera in the A lookup subset overlap by design
+  rather than as leakage.
 - **GAN comparison (C-set)** runs behind GPL-3.0 isolation with a fixed seed, ≥ 3
   repetitions per stem, and an explicit command spec: the adapter refuses to guess a
   competing tool's flags, so no GAN number exists until a spec is supplied, and the
@@ -171,7 +172,7 @@ share is the presentation policy described below.
 
 ### Added — interface and configuration
 
-- **Nine commands** (`gen`, `check`, `route`, `project`, `config`, `bench`, `data`,
+- **Eight commands** (`gen`, `check`, `route`, `project`, `config`, `bench`, `data`,
   `holdout`, with `--version` at the group level), each with dual-mode output:
   human-readable and `--json`, honouring the rule that every command accepts `--json`.
 - **Persistent configuration** in `~/.config/prokname/config.json` for taxdump and
@@ -243,7 +244,7 @@ share is the presentation policy described below.
 
 - Code: MIT. Data: **CC BY-SA 4.0** for LPSN-derived parts, **CC0 1.0** for the
   hand-built rule files, **CC BY 4.0** for the SeqCode Registry snapshot — the last
-  quoted from the Registry's own page and recorded with its retrieval date.
+  quoted from the Registry's own page and recorded with its 2026-09-25 retrieval date.
   `DATA_LICENSE` is the authoritative text and lists what it does *not* settle.
 
 ### Known limitations
@@ -258,16 +259,19 @@ share is the presentation policy described below.
 - **`check` cannot yet rule in the field.** SeqCode publishes no lookup-by-name, so the
   offline snapshot answers occupancy positively but never absence; LPSN needs
   credentials. Until then `check` returns `conflict` or `blocked`, and the three clean
-  verdicts stay gated. Recorded live cassettes for every endpoint actually used are
-  outstanding.
-- **Benchmark sets are seed-level** (135 annotated cases across A / B1 / B2 / C / D,
+  verdicts stay gated. VCR cassettes for every endpoint actually used are
+  outstanding (the GNA fixture is a genuine live JSON capture, not a cassette).
+- **Benchmark sets are seed-level** (133 annotated cases across A / B1 / B2 / C / D,
   against a target of ≥ 1 920 LPSN-derived, holdout-controlled cases). The B1
   false-negative target is not testable at that size, which the report states as
   evidence debt rather than a pass.
-- **Two licence questions stay open**: the cell-level derivation audit of
-  mixed-provenance rule assets before any of them is mirrored into a public dataset or
-  release archive, and whether the European sui generis database right is engaged by
-  redistributing the full SeqCode name list.
+- **Several licence questions stay open**: what CC BY-SA ShareAlike implies for
+  our own derived assets; the cell-level derivation audit of mixed-provenance rule
+  assets before any of them is mirrored into a public dataset or release archive,
+  including two shipped assets (`type_genus_stems.json`, `lpsn_status.json`) that
+  no `DATA_LICENSE` section enumerates and that must not be re-licensed as CC0
+  until that audit exists; and whether the European sui generis database right is
+  engaged by redistributing the full SeqCode name list.
 - **Registration entries still pending**: a bio.tools record. Zenodo is done — the
   v0.1.0 release was archived 2026-09-30 as version DOI
   [10.5281/zenodo.23052778](https://doi.org/10.5281/zenodo.23052778) under concept DOI

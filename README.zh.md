@@ -6,11 +6,11 @@
 [![PyPI - Version](https://img.shields.io/pypi/v/prokname)](https://pypi.org/project/prokname/)
 [![Python 3.11-3.14](https://img.shields.io/badge/python-3.11--3.14-blue)](https://pypi.org/project/prokname/)
 
-原核生物命名辅助工具。prokname 以确定性规则和可审计的决策支持为核心，帮助研究者为细菌与古菌的新分类单元拟定学名，并核对 **ICNP**（国际原核生物命名法规）与 **SeqCode**（原核生物序列命名规范）的合规要求。
+原核生物命名辅助工具。prokname 在 **ICNP**（国际原核生物命名法规）与 **SeqCode**（原核生物序列命名法规）下，为新的原核生物分类单元拟定名称提供确定性、可审计的决策支持。
 
-> prokname 仅提供命名辅助决策。名称的有效性完全由 ICNP 或 SeqCode 下的正式发表程序决定，本工具的输出不构成有效性裁定。
+> prokname 仅提供命名辅助决策。名称的有效性完全由 ICNP 或 SeqCode 下的正式发表程序决定——本工具的输出不构成有效性裁定。
 
-外部事实可在 `docs/provenance/` 核对，许可条款见 `DATA_LICENSE`，规则本身见随包数据资产 —— 规则的出处不会被写成某份未随包文档的小节。
+外部事实可在 `docs/provenance/` 核对，许可条款见 `DATA_LICENSE`，规则本身见随包数据资产——规则的出处绝不会被写成某份未随包文档的小节。
 
 ## 安装
 
@@ -34,7 +34,7 @@ pip install -e ".[online]"
 ## 使用
 
 ```bash
-# 人名词源 → 种加词候选生成
+# 人名词源 → 生成种级候选学名
 prokname gen --stem Boyd --type person --rank species \
     --genus Shigella --person-gender male
 # → Shigella boydii   （属格名词：与属名性别无关）
@@ -48,7 +48,8 @@ prokname gen --stem Beijing --type place --rank species --genus Klebsiella
 # 特征词源同时输出形容词形式和同位名词形式
 prokname gen --stem Wukong --type feature --rank species --genus Bacillus
 
-# 高阶元把法典强制后缀接在型属的"属格词干"上（--stem 传主格属名）
+# 更高阶元把法典强制后缀接在型属的“属格词干”上
+# （--stem 传主格属名）
 prokname gen --stem Bacillus    --type feature --rank family   # Bacillaceae
 prokname gen --stem Clostridium --type feature --rank order    # Clostridiales
 prokname gen --stem Pseudomonas --type feature --rank phylum   # Pseudomonadota
@@ -68,7 +69,7 @@ prokname bench
 prokname data
 ```
 
-更习惯图形界面？**ProkName Studio** 就是本引擎的桌面前端——中英双语、亮暗两套外观——它以独立项目的形式发布，依赖 `prokname`。像任何其它使用方那样安装它（见 [Studio 仓库](https://github.com/ZengZichao/ProkName-Studio)），然后用 `prokname-studio` 启动。它不新增任何命名逻辑：所有调用都走下面这套公开 API。
+比起终端，更习惯图形界面？**ProkName Studio** 就是本引擎的桌面前端——中英双语、亮暗两套外观——它以独立项目的形式发布，依赖 `prokname`。像任何其它使用方那样安装它（见 [Studio 仓库](https://github.com/ZengZichao/ProkName-Studio)），然后用 `prokname-studio` 启动。它不新增任何命名逻辑：所有调用都走下面这套公开 API。
 
 CLI 共注册 **八** 条命令：`gen`、`check`、`route`、`project`、`bench`、`holdout`、`data`、`config`。八条命令都支持 `--json` 机器可读输出。
 
@@ -76,39 +77,39 @@ CLI 共注册 **八** 条命令：`gen`、`check`、`route`、`project`、`bench
 
 - `0`：正常结束，可能附带警告。
 - `1`：错误。
-- `2`：参数错误（由 CLI 框架返回）。
-- `3`：阻断。权威源不可用，无法裁定；本地近似名命中以警告形式并列展示。
+- `2`：用法错误（由 CLI 框架返回）。
+- `3`：阻断。权威源无法给出裁定；本地近似名命中以警告形式并列展示。
 - `4`：冲突。权威源报告该名称已被占用。
 
-**当前 `check` 能回答什么。** `4`（冲突）可达，并且自 2026-09-25 起更强：SeqCode 适配器改为依据一份带日期的占用快照裁定，凡在 SeqCode 下已注册并有效发表的名字，即便离线也会判为冲突，不再等 LPSN。其余情形返回 `3`（阻塞），这是实测出来的边界而非未测的占位符——SeqCode Registry 公开 API 没有“按名字查询”，且其 `status=SeqCode` 列表被证明会漏掉注册方自己标注为有效的名字，所以“不在列表里”不能读成“未被占用”（见 docs/provenance/seqcode-registry-2026-09-25.md）。带告警的 `0` 与“无明确冲突”的 `0` 需要两个权威源都能给出否定答复；LPSN 在带凭据且可达时可以，因此这三个裁定态在端到端仍不可达。请把 `3` 读作“工具没能问到”，绝不是“这个名字没问题”。
+**当前 `check` 能回答什么。** `4`（冲突）可达，并且自 2026-09-25 起更强：SeqCode 适配器改为依据一份带日期的占用快照裁定，凡在 SeqCode 下已注册并有效发表的名字，即便离线也会判为冲突，无需等待 LPSN。其余情形一律返回 `3`（阻断），这是实测出来的边界而非未测的占位符——SeqCode Registry 公开 API 没有“按名字查询”，且其 `status=SeqCode` 列表被证明会漏掉注册中心自己标注为有效的名字，所以“不在列表里”不能读成“未被占用”（见 [seqcode-registry-2026-09-25.zh.md](docs/provenance/seqcode-registry-2026-09-25.zh.md)）。带警告的 `0`、判为“无明确冲突”的 `0` 与近似名（parahomonym）警告，这三者都需要两个权威源都能给出否定答复；LPSN 在带凭据且可达时可以，因此在这一录制存在之前，这三个裁定态在端到端仍不可达。请把 `3` 读作“工具没能问到”，绝不是“这个名字没问题”。（`Wukomonas` 为演示用的虚构属名，并非已发表名称。）
 
-## 设计决策
+## 值得关注的设计决策
 
-- **人名种加词是属格名词**，不随属名变格。词尾取决于姓氏拉丁化后落入哪个*变格范式*，例如 *Shigella boydii*、*Bartonella henselae*、*Borrelia burgdorferi*。它既不受纪念者性别影响，也不随属名的语法性别变格。只有真形容词才随属名性别变格。
-- 上述人名属格规则是引擎的核心规则，已由回归测试锚定。`person_genitive.json` 按范式建模，并收录一份已证实姓氏词库：只有“已证实且 `verified: true`”的条目才断言合规，默认规则给出的提案一律标记 `needs_review`（见[已知局限](#已知局限)）。
-- **高阶元名称以型属的属格词干为基底**（*Bacillus*，属格 *Bacilli* → `Bacillaceae` / `Bacillales`；*Clostridium* → `Clostridiales`；*Pseudomonas* → `Pseudomonadota`），绝不把后缀直接拼在主格上。引擎原样保留保留名（如 class `Bacilli`），不会“纠正”它们；构成规则正确但未见于发表的名称返回 `compliant=None`，并附警告。
-- **`person_genitive.json` 绝不凭记忆填格**：未核验的范式随包发布时标注 `verified: false`，其输出只是带标记的提案；范式无法推断的姓氏抛出 `GenitiveCellUnavailable`，而不是臆测结果。补齐这些格子属于 M0 签字项，须对照 ICNP 正字法附录逐一核验。
-- **性别判定双模式**：一是词库查找（高置信，`genus_gender.json` 收录 58 个策展属），二是词尾启发式推断（**始终**标记 `needs_review`）。引擎绝不默认阳性。
+- **人名种加词是属格名词**，本身不可变格；词尾取决于姓氏拉丁化后落入哪个*变格范式*，例如 *Shigella boydii*、*Bartonella henselae*、*Borrelia burgdorferi*。它既不受被纪念者的性别影响，也不随属名的语法性别变格。只有真形容词才随属名性别变格。
+- 上述人名属格规则是引擎的核心规则，已由回归测试锚定。`person_genitive.json` 按范式建模，并收录一份已证实姓氏词库：只有已证实且经过核验的条目才断言合规，默认规则给出的提案一律标记 `needs_review`（见[已知局限](#已知局限)）。
+- **更高阶元名称以型属的属格词干为基底**（*Bacillus*，属格 *Bacilli* → `Bacillaceae` / `Bacillales`；*Clostridium* → `Clostridiales`；*Pseudomonas* → `Pseudomonadota`），绝不把后缀直接拼在主格上。引擎对保留名（如纲 `Bacilli`）原样保留，不会去“纠正”它们；按规则正常构成、但未经证实的名称返回 `compliant=None`，并附警告。
+- **`person_genitive.json` 绝不凭记忆填充范式**：未核验的范式随包发布时标注 `verified: false`，其输出只是带标记的提案；范式无法推断的姓氏抛出 `GenitiveCellUnavailable`，而不是臆测结果。补齐这些范式格子属于 M0 签字项，须对照 ICNP 正字法附录逐一核验。
+- **性别判定双模式**：一是词库查找（高置信，`genus_gender.json` 收录 58 个人工整理的属），二是词尾/词素推断（**始终**标记 `needs_review`）。引擎绝不默认阳性。
 - **权威源不可用时阻断裁定**（`blocked`，退出码 3）：“无法查证”绝不伪装成“未发现”。
-- **常规 CI 不联网**：在线适配器改由离线桩件客户端钉住契约。`tests/fixtures/` 现已含有一份真正来自运行中服务的录制——`gna_verifications_live.json`，由 `scripts/record_live_gna.py` 录制（GNA 无需凭据），并由周期 live-smoke 作业复检上游漂移。LPSN（需凭据）与 SeqCode 的 REST 契约仍未录制，因此权威层未经实时验证；`manifest.json` 如实区分二者。
-- **数据许可以 `DATA_LICENSE` 为准**：代码 MIT（`LICENSE`）；LPSN 衍生数据 CC BY-SA 4.0（署名并相同方式共享）；自研规则文件 CC0 1.0；SeqCode Registry 数据 CC BY 4.0——该条款于 2026-09-25 摘自注册中心自己的 API 页面，因此部分导出写出的“SeqCode data: CC-BY 4.0”现在有了出处，而不再是沿用早期草稿的署名散文。
-- `DATA_LICENSE` 仍留有两个许可问题，并已如实列出：混合来源规则资产的逐格来源审计，以及再分发完整 SeqCode 名单是否触及欧盟数据库特殊权利。
+- **常规 CI 不联网**：在线适配器改由离线桩件客户端钉住契约。`tests/fixtures/` 现已含有一份真正来自运行中服务的录制——`gna_verifications_live.json`，由 `scripts/record_live_gna.py` 录制（GNA 无需凭据），并由周期 live-smoke 作业复检上游漂移。LPSN（需凭据）与 SeqCode 的 REST 契约仍无实时捕获夹具，因此权威层未经实时验证；`manifest.json` 如实区分二者。
+- **数据许可以 `DATA_LICENSE` 为准**：代码 MIT（`LICENSE`）；LPSN 衍生数据 CC BY-SA 4.0（署名与相同方式共享）；自研规则文件 CC0 1.0；SeqCode Registry 数据 CC BY 4.0——该条款于 2026-09-25 摘自注册中心自己的 API 页面，因此部分导出写出的“SeqCode data: CC-BY 4.0”现在有了出处，而不再是沿用早期草稿的署名表述。
+- `DATA_LICENSE` 仍留有若干许可问题，并已如实列出：CC BY-SA 相同方式共享义务对我们自有衍生资产的含义；混合来源规则资产在被镜像进公共数据集或发布归档之前需要的逐格来源审计（其中 `type_genus_stems.json` 与 `lpsn_status.json` 两个随包资产未被任何小节列举，审计完成前不得改按 CC0 许可）；以及再分发完整 SeqCode 名单是否触及欧盟的 sui generis 数据库权。
 
 ## 开发
 
 ```bash
 pytest                           # 当前环境能收集到的全部测试
 pytest --collect-only -q         # 权威的按模块测试计数
-ruff check src scripts tests     # lint 门禁（CI 强制）
+ruff check src scripts tests conftest.py  # lint 门控（CI 强制）
 prokname bench                   # 内置实名锚定回归种子
-prokname bench --full            # 种子基准 A/B1/B2/C/D（门禁式：未达标退出码 1）
-prokname holdout                 # CI 门禁：A-"推断"子集 ∩ 词库 = ∅
+prokname bench --full            # 种子基准 A/B1/B2/C/D（门控式：被违反的门控以退出码 1 结束）
+prokname holdout                 # CI 门控：A-INFERENCE 子集 ∩ 词库 = ∅
 ```
 
 下面这个数字是生成的，不是手写的：`python scripts/fill_test_counts.py` 写入 `pytest --collect-only` 实际收集到的数量，CI 会在它过期时报错（`pytest --collect-only -q` 给出构成它的按模块计数）。
 
-- 本仓库自己的套件收集 967 项，无需安装任何扩展组。ProkName Studio 的测试随 Studio 一同计数；这里没有任何东西依赖 Qt，因为这里没有任何东西导入它。
-- 3 项 `taxonkit` 交叉验证测试在所有环境都会进入收集清单，但 `PATH` 缺少该二进制时**跳过**。`.github/workflows/ci.yml` 中没有 `taxonkit` 安装步骤，因此该交叉验证门控在本项目 CI 中从不运行。
+- 安装 `.[dev]` 后，本仓库自己的套件收集 967 项测试。ProkName Studio 的测试套件位于 Studio 仓库，也在那边计数；这里没有任何门控项以 Qt 为前提，因为本仓库没有任何模块导入 Qt。
+- 3 项 `taxonkit` 交叉验证测试在所有环境都会进入收集清单，但 `PATH` 上缺少该二进制时跳过。`.github/workflows/ci.yml` 中没有 `taxonkit` 安装步骤，因此该交叉验证门控在本项目的 CI 中不会运行。
 
 ## 已知局限
 
@@ -117,13 +118,13 @@ prokname holdout                 # CI 门禁：A-"推断"子集 ∩ 词库 = ∅
 - 基准集为**种子规模**（A 74 = 15 查找 + 59 推断；B1 26，仅 **4 例负例**，`feature` 与 `thing` 两支各 0 例；B2 17；C 5 词干 × 3 次重复；D 11）。n = 3～26 上的全对结果不足以支撑“漏报率 ≤ 1%”或“100%”这类目标。自助法置信区间给出的是准确度区间，在全对样本上会坍缩为一点。
 - 近似名语料是一份 **16 条、带日期的演示语料**（`corpus_seed.json`，2026-08-16；LPSN ×12、synthetic-demo ×2、SeqCode Registry ×1、NCBI ×1），尚未测量召回率与假阳率。
 - **与 `gan` 的 C 集对比从未运行**：`bench --full` 以 `skip_gan=True` 评估该套件，CI 不安装 gan。
-- 规则资产仍待 **M0 专家签字**。`rules.json` 已为每个超属级后缀标注强度（ICNP 强制、SeqCode 建议、亚阶元为采纳植物学惯例），但这些归属本身及其条款引证仍标注为 `verified: false`，需要专家裁断。
+- 规则资产仍待 **M0 专家签字**。`rules.json` 已为每个超属级后缀标注强度（ICNP 强制、SeqCode 建议、亚阶元为采纳植物学法规惯例），但这些归属本身及其条款引证仍标注为 `verified: false`，需要专家裁断。
 
 ## 引用
 
-若 prokname 对您的研究有帮助，请引用本软件（`CITATION.cff`）：
+若您使用了 prokname，请引用本软件（`CITATION.cff`）：
 
 - **Zichao Zeng**（ORCID [0000-0001-6553-970X](https://orcid.org/0000-0001-6553-970X)）
-- **Zenodo 存档**：concept DOI [10.5281/zenodo.23052777](https://doi.org/10.5281/zenodo.23052777)，始终解析到最新版本；本版本 v0.1.0 对应 [10.5281/zenodo.23052778](https://doi.org/10.5281/zenodo.23052778)
+- **Zenodo 存档**：概念 DOI（concept DOI）[10.5281/zenodo.23052777](https://doi.org/10.5281/zenodo.23052777)，始终解析到最新已归档版本；本版本对应 [10.5281/zenodo.23052778](https://doi.org/10.5281/zenodo.23052778)
 
 代码采用 MIT 许可（见 `LICENSE`）。数据许可见 `DATA_LICENSE`：LPSN 衍生部分为 CC BY-SA 4.0，自研规则文件为 CC0 1.0，SeqCode Registry 数据为 CC BY 4.0（2026-09-25 摘自上游页面）。

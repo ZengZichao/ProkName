@@ -42,9 +42,12 @@ prokname is MIT-licensed. To prevent license contamination:
   per-name `https://seqco.de/i:<id>` URIs when republishing. CC BY carries no
   ShareAlike — but where one file mixes LPSN-derived and SeqCode-derived
   content, the stricter BY-SA obligation governs the whole file. What
-  `DATA_LICENSE` still records as unresolved is not the licence but the
-  European sui generis database right, on which the Registry has never
-  published a statement.
+  `DATA_LICENSE` also still records as unresolved is the ShareAlike implication
+  for our own derived rule assets, the cell-level derivation audit that must
+  precede any re-publication — two shipped assets, `type_genus_stems.json` and
+  `lpsn_status.json`, are not enumerated there at all and must not be
+  re-licensed as CC0 until that audit exists — and the European sui generis
+  database right, on which the Registry has never published a statement.
 - **NCBI taxdump**: follows NCBI usage terms; the taxdump is redistributable.
 - **Never** commit API credentials, passwords, or tokens to the repository.
   Use OS keyring or environment variables (see `prokname config`).
@@ -89,14 +92,14 @@ does for the vowel-stem person-genitive cells.
   stale. There is one number now — nothing in this package imports
   Qt, so no module is gated on a GUI extra. ProkName Studio's suite is counted
   with Studio. The 3 `taxonkit` cross-check tests are collected but **skipped**
-  unless the `taxonkit` binary is on `PATH`; the CI jobs that run pytest install
-  neither (`.github/workflows/ci.yml` has no `taxonkit` step), so that
-  cross-validation gate never runs in this project's CI.
-- Lint must pass: `ruff check src scripts tests` (CI-enforced).
+  unless the `taxonkit` binary is on `PATH`; the CI jobs that run pytest do not
+  install `taxonkit` (`.github/workflows/ci.yml` has no `taxonkit` step), so
+  that cross-validation gate never runs in this project's CI.
+- Lint must pass: `ruff check src scripts tests conftest.py` (CI-enforced).
 
 ## CI gates (blocking)
 
-1. `ruff check src scripts tests` passes.
+1. `ruff check src scripts tests conftest.py` passes.
 2. All unit + property tests pass on Linux, Windows, macOS (Python 3.11+).
    The matrix installs `.[dev]`: the engine has no GUI extra to skip.
 3. `prokname bench` (regression seed) passes.
@@ -104,8 +107,15 @@ does for the vowel-stem person-genitive cells.
 5. `prokname holdout` (holdout integrity) passes.
 6. `python scripts/verify_examples.py` (M0 example verification) passes.
 7. Wheel build + clean-venv install smoke passes (package data included).
-8. Benchmark degradation >2pp relative to baseline blocks the merge.
+8. The `ci-summary` job is the single required check that actually blocks a
+   merge: it turns red only when one of `lint`, `test` or `wheel-smoke` fails.
+   There is **no** automated benchmark-degradation gate — CI implements no
+   ">2 pp relative to baseline" threshold and compares a run against no stored
+   baseline; that mechanism is not implemented.
 
-The weekly `live-smoke` job is scheduled separately and is currently wrapped
-in `continue-on-error` + `|| true`, i.e. it cannot fail CI; treat its output as
-a drift report, not as a gate.
+The weekly `live-smoke` job is **not** wrapped in `continue-on-error` or
+`|| true` any more — those were intentionally removed, and the job is meant to be
+allowed to go red when the pinned LPSN/GNA/SeqCode contract assumptions drift. It
+runs only on the weekly schedule (`if: github.event_name == 'schedule'`) and is
+**not** listed in `ci-summary`'s `needs:`, so a red live-smoke run never blocks a
+pull request or a merge.

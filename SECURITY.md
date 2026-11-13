@@ -10,7 +10,7 @@ and the most recent tagged release receive security fixes.
 ## Reporting a vulnerability
 
 Please use **GitHub's private vulnerability reporting** for anything that
-could be exploited (Reports → "Report a vulnerability" on this repository).
+could be exploited (Security → "Report a vulnerability" on this repository).
 This keeps the details confidential until a fix is released. If private
 reporting is unavailable for any reason, open a regular issue **without
 exploitation details** and say "security" in the title so it can be moved to

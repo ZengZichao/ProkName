@@ -48,7 +48,7 @@ Re-check every entry, and fail if a cited passage no longer exists:
 | URL | `https://raw.githubusercontent.com/LeibnizDSMZ/lpsn-api/c15229e7/README.md` |
 | Verified | 2026-09-25 by `scripts/check_upstream_citations.py` — the printed example is literally `{782310: [{'full_name': 'Sulfolobus acidocaldarius'}, {'lpsn_taxonomic_status': 'correct name'}], ...}` |
 | Consumed by | `dedup/lpsn.py` (identity guard + status classification), `tests/fixtures/lpsn_retrieve_entries.json` |
-| Consequence if wrong | A renamed field makes the identity guard stop matching, so a published name degrades to `not_found`; the always-unavailable SeqCode adapter then turns that into `BLOCKED` rather than a false clean verdict. This is the drift the scheduled live-smoke exists to catch. |
+| Consequence if wrong | A renamed field makes the identity guard stop matching, so a published name degrades to `not_found`; the SeqCode adapter — which since the 2026-09-25 probe rules from a dated local occupancy snapshot instead of returning `unavailable` unconditionally — answers such a miss with `FOUND_UNKNOWN`, a non-ruling status that keeps the adjudication `BLOCKED` rather than a false clean verdict, while a name the snapshot does carry produces a real `CONFLICT`. This is the drift the scheduled live-smoke exists to catch. |
 
 **Corollary that is *not* upstream-documented, and is therefore still marked
 `verified: false` in the data asset:** real LPSN pages and the API sometimes
@@ -95,7 +95,7 @@ status rows stay unverified.
 | --- | --- |
 | Establishes | Which `name_class` values exist and what they mean — in particular that `authority` is an author citation rather than a synonym, and that `misspelling` is the parahomonym signal. |
 | Source | `https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_readme.txt` — **not vendored**, and the vendored taxonkit snapshot parses `names.dmp` without documenting the vocabulary. |
-| Verified | Not verified against a live download. Every row of the resulting semantics table in `dedup/ncbi.py` and `data/lpsn_status.json`-adjacent structures carries `verified: false` for exactly this reason. |
+| Verified | Not verified against a live download. Every row of the resulting semantics table in `dedup/ncbi.py` — the label→claim table whose shape `data/lpsn_status.json` shares — carries `verified: false` for exactly this reason. The claim does not extend to `data/lpsn_status.json` itself: there the rows corroborated by live LPSN pages carry `verified: true`, and only the labels never observed on a live page carry `verified: false`. |
 | Consumed by | `dedup/ncbi.py`, `tests/fixtures/ncbi_names_tiny.dmp` |
 | What would close it | Download the README, quote the value list here with a retrieval date, and flip the table's `verified` flags. |
 
@@ -120,8 +120,8 @@ Two rules follow, and both are enforced rather than asserted:
 
 `ProkName-参考项目/` is a read-only local mirror of the upstream projects
 (lpsn-api, gnverifier, seqcode-documentation, taxonkit), downloaded 2026-09-07,
-with commit pins and licences recorded in its own README. `tests/fixtures/
-manifest.json` names it as `vendored_snapshot_root`.
+with commit pins and licences recorded in its own README. `tests/fixtures/manifest.json`
+names it as `vendored_snapshot_root`.
 
 It is **not** part of this repository, so it may not be the only place a
 citation resolves. Its role is convenience (offline reading, grep); the

@@ -267,9 +267,10 @@ Behaviour you can rely on:
   credentials). See [Known limitations](#10-known-limitations).
 
 Five-state verdicts: `conflict`, `parahomonym_warning`, `verify_warning`,
-`blocked`, `no_clear_conflict`. Until the SeqCode authority contract is
-recorded (M0), only `conflict`, `blocked` and the near-match warnings are
-reachable in practice — see the FAQ.
+`blocked`, `no_clear_conflict`. Until BOTH authorities can answer negatively — a
+miss in the SeqCode snapshot is itself a hard block, and LPSN needs credentials
+and must be reachable (an M0/M2 item) — only `conflict`, `blocked` and the
+near-match warnings are reachable in practice — see the FAQ.
 
 ### `prokname route`
 
@@ -342,10 +343,11 @@ Notes:
 - Exports are annotated with: tool version, export timestamp, disclaimer,
   and the data attribution statements the code emits verbatim ("LPSN data:
   CC BY-SA 4.0", "SeqCode data: CC-BY 4.0"). Note that `DATA_LICENSE` — the
-  authoritative licence text in this repository — currently grants only two
-  terms: **CC BY-SA 4.0** for LPSN-derived parts and **CC0 1.0** for the
-  hand-built rule files; the SeqCode-derived clause is an open question there
-  (see [Data assets and licensing](#7-data-assets-and-licensing)).
+  authoritative licence text in this repository — grants three terms:
+  **CC BY-SA 4.0** for LPSN-derived parts, **CC0 1.0** for the hand-built rule
+  files, and **CC BY 4.0** for the SeqCode Registry snapshot; the
+  SeqCode-derived clause that used to be recorded there as an open question was
+  resolved on 2026-09-25 (see [Data assets and licensing](#7-data-assets-and-licensing)).
   Markdown exports additionally carry a **draft SeqCode Registry etymology
   table** per candidate (full word + grammar pre-filled from the stored
   derivation; the morpheme rows are deliberately left for author completion —
@@ -354,7 +356,7 @@ Notes:
 ### `prokname bench` / `prokname holdout`
 
 ```bash
-prokname bench            # built-in engine regression seed (25 real-name anchored cases)
+prokname bench            # built-in engine regression seed (51 real-name anchored cases: 29 validate + 14 generate + 8 gender)
 prokname bench --full     # A/B1/B2/C/D benchmark suites with baselines and bootstrap CIs
 prokname holdout          # CI gate: A-INFERENCE subset ∩ published lexicon must be empty
 ```
@@ -374,8 +376,10 @@ generation exact-match and top-3 rates (B2), routing accuracy with the
 ICNP-preemption sub-class (D, target 100 %), and the C-set scaffold — which
 runs with `skip_gan=True`, i.e. only the prokname side is exercised; the
 two-sided comparison against `gan` has not been run. It is also a **CI gate**:
-if the holdout check fails, the B1 false-negative rate exceeds its target, or
-the D-set preemption sub-class misses 100 %, the command exits 1.
+a gate that is *violated* — the holdout check, or the D-set preemption sub-class
+missing 100 % — exits 1, while a gate the shipped seed cannot test (the B1
+false-negative target) is reported as evidence debt and fails only under
+`--require-complete`, the milestone mode.
 Every result also carries a refusal-aware accuracy (with its own bootstrap
 CI): an honest `needs_review` refusal on a truly unknown genus counts as
 **correct**, because refusing to guess is the designed behaviour. The bootstrap
@@ -457,7 +461,7 @@ verdict and no exit code.
 | `3` | `check` verdict: blocked — an authority was unavailable **or answered with something that cannot rule** (`found_unknown`); local near-match hits are listed as warnings alongside, never promoted to a ruling (see the FAQ) |
 | `4` | `check` verdict: conflict — an authority reports the name as occupied |
 
-Only `3` and `4` are non-zero, and only `4` means "occupied". Both warning
+Only `3` and `4` are non-zero `check` verdicts, and only `4` means "occupied". Both warning
 verdicts and "no clear conflict" exit `0` — "checked, with caveats" is a
 success — so a script must read the verdict, not just the exit code. See the
 FAQ for which verdicts the current data sources can actually produce.
@@ -497,12 +501,13 @@ expert verification.
 ## 5. Python API
 
 ```python
-from prokname.engine import generate_candidates, validate_agreement, gender_of, Gender
+from prokname.engine.generate import generate
+from prokname.engine import validate_agreement, gender_of, Gender
 from prokname.routing import route
 from prokname.dedup import check_name
 
 # 1. generate candidates
-candidates = generate_candidates(
+candidates = generate(
     "Beijing", "place", "species", genus="Klebsiella")
 for c in candidates:
     print(c.name, c.grammatical_category, c.compliant, c.warnings)
@@ -568,34 +573,41 @@ all-hit samples; exact binomial bounds for the small samples are given in
 | Asset | Purpose | Status |
 |---|---|---|
 | `rules.json` | rank suffixes, adjective paradigms, type→category map | M0 draft, expert sign-off pending |
-| `person_genitive.json` | latinisation-paradigm table + attested-surname lexicon + default rules | only attested/verified entries assert compliance; defaults are `needs_review`; 3 paradigms `verified: false` |
+| `person_genitive.json` | latinisation-paradigm table + attested-surname lexicon + default rules | only attested/verified entries assert compliance; defaults are `needs_review`; 2 of the 5 paradigms (`first_declension_ia`, `third_declension_consonant`) are `verified: false`, as are all 4 `defaults` entries |
 | `genus_gender.json` | lookup lexicon (**58** curated genera: 23 f / 20 m / 15 n) | curated seed |
 | `type_genus_stems.json` | type-genus genitive stems + attested higher-rank names for suprageneric derivation | M0 draft; drives the `compliant=None` attestation gate |
 | `gender_endings.json` | inference heuristics (morphemes → exceptions → generic endings) | heuristic, always `needs_review` |
 | `stems.json` | user-extensible stem library | illustrative seeds (not yet wired into the CLI) |
 | `corpus_seed.json` | near-match **demo** corpus: 16 names, `corpus_date` 2026-08-16 (LPSN ×12, synthetic-demo ×2, SeqCode Registry ×1, NCBI ×1) | tests/demos only |
-| `lpsn_status.json` | expert-reviewable LPSN `lpsn_taxonomic_status` label → category map (replaces the old substring test) | consumed by `dedup/lpsn.py`; **not** listed by `prokname data` yet |
+| `lpsn_status.json` | expert-reviewable LPSN `lpsn_taxonomic_status` label → category map (replaces the old substring test) | consumed by `dedup/lpsn.py`; listed by `prokname data` |
 | `rate_limit_budget.json` | API rate-limit budget table for corpus rebuilds | M2 deliverable |
 
-`prokname data` reports the eight assets wired through
-`engine/data.py::asset_status()`; `lpsn_status.json` is loaded directly by the
-LPSN adapter and is therefore missing from that listing.
+`prokname data` reports the ten assets wired through
+`engine/data.py::asset_status()`: the nine listed above plus the SeqCode
+occupancy snapshot `seqcode_registered.json`.
 
 58 (lexicon size) and 59 (A-inference subset size) are unrelated counts; the
 A-set itself is 74 = 15 lookup + 59 inference.
 
 **`DATA_LICENSE` is the single source of truth for data licensing, and it
-grants exactly two terms:** CC BY-SA 4.0 for the LPSN-derived parts
-(attribution + ShareAlike) and CC0 1.0 for the hand-built rule files
-(`rules.json`, `gender_endings.json`, `person_genitive.json`, `stems.json`).
-Code itself is MIT (`LICENSE`). There is **no** SeqCode-derived licence clause
-in `DATA_LICENSE`: the "SeqCode data: CC-BY 4.0" strings emitted by
-`storage/store.py` and declared in `corpus_seed.json`'s `_meta.provenance` are
-prose, not a granted licence, and the redistribution terms for SeqCode-derived
-data are recorded as an open question in `DATA_LICENSE`'s status notice. Every
-export and JSON output carries the attribution statements as described above —
-treat them as attribution to the upstream sources, and re-check the
-`DATA_LICENSE` notice before re-publishing derived assets.
+grants exactly three terms:** CC BY-SA 4.0 for the LPSN-derived parts
+(attribution + ShareAlike), CC0 1.0 for the hand-built rule files
+(`rules.json`, `gender_endings.json`, `person_genitive.json`, `stems.json`),
+and CC BY 4.0 for the SeqCode Registry snapshot (`seqcode_registered.json`),
+quoted from the Registry's own page and recorded with its 2026-09-25 retrieval
+date. Code itself is MIT (`LICENSE`). The "SeqCode data: CC-BY 4.0" strings
+emitted by `storage/store.py` and declared in `corpus_seed.json`'s
+`_meta.provenance` therefore name a granted licence rather than prose alone.
+What `DATA_LICENSE` still leaves open is what ShareAlike implies for our own
+derived assets, the cell-by-cell derivation audit required before re-publishing
+a mixed-provenance rule asset (two shipped assets, `type_genus_stems.json` and
+`lpsn_status.json`, are not enumerated by any section there and must not be
+re-licensed as CC0 until that audit exists), whether a release artefact that
+redistributes the snapshot separately should be confirmed with the SeqCode
+Initiative, and the EU sui generis database-right question. Every export and JSON output carries the
+attribution statements as described above — treat them as attribution to the
+upstream sources, and re-check the `DATA_LICENSE` notice before re-publishing
+derived assets.
 
 ---
 
@@ -653,8 +665,8 @@ Two things are true at once, and both are measured rather than assumed:
 
 Treat `3` as "the tool could not ask", never as "the name is fine". The
 intermediate verdicts (`0` with a warning, `0` for "no clear conflict", the
-parahomonym warning) become reachable end-to-end as soon as LPSN can answer
-negatively; see the live-capture list in `tests/fixtures/manifest.json`.
+parahomonym warning) become reachable end-to-end only once BOTH authorities can
+answer negatively; see the live-capture list in `tests/fixtures/manifest.json`.
 Local near-match hits are still reported as warnings alongside `3`.
 Offline mode reports every authority as `unavailable`, which blocks
 adjudication on purpose. Install the optional online extra
@@ -722,7 +734,7 @@ property of the shipped seed data, not a usage mistake.
 - **The `taxonkit` cross-validation gate is opt-in and skipped in the shipped
   CI images**, which install `.[dev]` only and no `taxonkit` binary; the 3
   cross-check tests are collected and skipped unless you provide it.
-- **`check` cannot rule in the field today.** With SeqCode M0-gated to
-  `unavailable`, real checks exit 3 (blocked) or 4 (conflict) only.
+- **`check` can never clear a name in the field today.** No authority can yet
+  answer "no", so real checks exit 3 (blocked) or 4 (conflict) only.
 
 Chinese counterpart: [USAGE.zh.md §10](USAGE.zh.md#10-已知局限).
