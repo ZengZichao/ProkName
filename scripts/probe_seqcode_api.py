@@ -14,6 +14,14 @@ something drifted (and prints what), 2 when the service could not be reached.
 Drift is not an error to fix here — it is the news that the M0 gate may be
 re-openable, or that a previously working route has gone.
 
+List sizes are deliberately excluded from drift. The registry is used daily, so
+a count that grows or shrinks between two weekly runs is the service working,
+and a gate that fails on it becomes noise nobody reads. A count crossing zero
+still is drift: zero-versus-nonzero is exactly the difference between "this
+filter matched nothing" and "this filter was ignored", which is the change
+measured between 2026-09-25 (`status=nonsense` -> `count: 0`) and 2026-11-13
+(-> 52 395).
+
 Nothing in this script is imported by prokname; it is a provenance tool, like
 scripts/record_live_gna.py. Both deliberately talk to the outside world only
 when a human runs them.
@@ -23,6 +31,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from typing import NamedTuple
 
@@ -105,7 +114,7 @@ def main() -> int:
     parser.add_argument("--json", action="store_true", dest="as_json")
     args = parser.parse_args()
 
-    observations, drift = [], []
+    observations, drift, moved = [], [], []
     for key in RECORDED:
         obs = _probe(f"{BASE}/{key}")
         observations.append(obs)
@@ -119,7 +128,13 @@ def main() -> int:
                                  obs.body_head.replace(" ", "")):
                     drift.append(f"{key}: body no longer the documented ok")
             elif got != expected:
-                drift.append(f"{key}: {field} {expected!r} -> {got!r}")
+                # A list that grew or shrank is the registry being used. A value
+                # crossing zero is the filter's meaning changing, so only the
+                # crossing is drift.
+                if field in ("count", "pages") and expected and got:
+                    moved.append(f"{key}: {field} {expected} -> {got}")
+                else:
+                    drift.append(f"{key}: {field} {expected!r} -> {got!r}")
 
     if args.as_json:
         print(json.dumps([o._asdict() for o in observations], indent=2))
@@ -143,6 +158,13 @@ def main() -> int:
         print("\nRe-date the provenance record; if a by-name lookup appeared, "
               "the M0 gate in dedup/seqcode.py is worth reopening.")
         return 1
+    if moved:
+        print("\ncounts moved since the record — shape unchanged, not drift:")
+        for line in moved:
+            print("  ~", line)
+        if os.environ.get("GITHUB_ACTIONS") == "true":
+            print(f"::warning title=SeqCode counts moved::{len(moved)} count(s) "
+                  "moved since the dated record; re-date it when convenient")
     print("\nlive service still matches the recorded endpoint contract")
     return 0
 

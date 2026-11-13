@@ -188,7 +188,10 @@ jobs:
       - name: SeqCode endpoint contract check (drift fails the run)
         # SeqCode rules from data/seqcode_registered.json, not from the wire,
         # so this job would stay green forever if upstream changed shape. This
-        # is the one check that keeps that snapshot honest.
+        # is the one check that keeps that snapshot honest. List sizes are
+        # reported and tolerated — the registry grows weekly, and a gate that
+        # fails on growth is noise; a shape change, or a count crossing zero,
+        # still fails.
         run: python scripts/probe_seqcode_api.py
 
       - name: Upstream citation drift check (docs/provenance)
