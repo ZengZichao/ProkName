@@ -61,7 +61,11 @@ def run_full_benchmark(dest_results: Path) -> dict:
     ok = proc.returncode in (0, 1) and payload.startswith(("{", "["))
     (dest_results / "benchmark_results.json").write_text(payload or "{}\n")
     (dest_results / "bench_stderr.txt").write_text(proc.stderr)
-    return {"captured": ok, "returncode": proc.returncode, "bytes": len(payload)}
+    # len(payload) counts CHARACTERS; the table below promises BYTES, and the
+    # JSON carries multi-byte characters (e.g. the ✓ in the holdout message),
+    # so the two differed by 171 in the 0.1.0 deposit. Measure the file.
+    return {"captured": ok, "returncode": proc.returncode,
+            "bytes": (dest_results / "benchmark_results.json").stat().st_size}
 
 
 def manifest(root: Path, patterns=("*.py",)) -> list[dict]:
@@ -104,6 +108,14 @@ def main() -> int:
     (out / "code" / "manifest.json").write_text(json.dumps(man, indent=2) + "\n")
     n_code_files = len(man["src"]) + len(man["tests"])
 
+    if bench_info.get("skipped"):
+        results_cell = "skipped (--skip-bench)"
+    else:
+        results_cell = (
+            f"2 (`benchmark_results.json` + `bench_stderr.txt`; "
+            f"exit {bench_info['returncode']}, {bench_info['bytes']} bytes)"
+        )
+
     notes = f"""# ProkName research-data deposit package (v{__version__})
 
 Generated: {datetime.now(UTC).isoformat(timespec='seconds')}
@@ -115,14 +127,17 @@ Built by: `python3 scripts/make_deposit.py` (deterministic; no network access).
 | `rule_assets/` | versioned nomenclatural rule and lexicon JSON | {len(rules)} |
 | `benchmark_sets/` | annotated benchmark cases A/B1/B2/C/D + per-case provenance | {len(sets_)} |
 | `corpus/` | de-duplication corpus snapshot + its rebuild script | 2 |
-| `results/` | one gated full-benchmark run (`benchmark_results.json`) | {bench_info} |
+| `results/` | one gated full-benchmark run (`benchmark_results.json`) | {results_cell} |
 | `code/manifest.json` | sha256 of every shipped source and test file | {n_code_files} entries |
 
 ## Licence terms of the payload
 * Code: MIT.
-* `rule_assets/genus_gender.json` and LPSN-derived corpus rows: CC BY-SA 4.0 (attribution +
-  ShareAlike) - see `DATA_LICENSE` in the code repository.
-* `rule_assets/rules.json`, `gender_endings.json`, `person_genitive.json`, `stems.json`: CC0 1.0.
+* `rule_assets/genus_gender.json`, `lpsn_status.json`, `type_genus_stems.json` and the
+  LPSN-derived corpus rows: CC BY-SA 4.0 (attribution + ShareAlike) plausibly governs, per
+  the open derivation audit in `DATA_LICENSE` (M0 item) - until that audit closes, treat
+  all three as governed by the LPSN terms.
+* `rule_assets/rules.json`, `gender_endings.json`, `person_genitive.json`, `stems.json`,
+  `rate_limit_budget.json`: CC0 1.0.
 * `rule_assets/seqcode_registered.json`: **CC BY 4.0** — the SeqCode Registry publishes its
   contributed information under those terms (quoted in `DATA_LICENSE`, retrieved 2026-09-25),
   so this snapshot ships it with the Registry's attribution and the per-name `https://seqco.de/i:<id>`

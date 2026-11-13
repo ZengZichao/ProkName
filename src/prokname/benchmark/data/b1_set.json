@@ -9,7 +9,7 @@
     },
     "license": "CC BY-SA 4.0 (LPSN-derived)",
     "case_count": 26,
-    "expanded": "2026-09-04: +13 curated cases (annotator=curated-seed); pending M0 LPSN API batch verification",
+    "expanded": "2026-09-04: +12 curated cases (annotator=curated-seed); pending M0 LPSN API batch verification",
     "note_on_female_person_cells": "Female-person genitive coverage (consonant-stem -iae) awaits M0 verification of a confirmed real example; vowel-stem cells are intentionally unpopulated."
   },
   "cases": [
