@@ -38,6 +38,19 @@ released under **CC0 1.0** (dedicated to the public domain by the authors),
 except where a cell is explicitly marked as transcribed from a copyrighted
 source, in which case the source's terms apply.
 
+## `rate_limit_budget.json`
+
+Hand-authored operational configuration: the upstream base URLs, what
+authentication each service needs, the request pacing the authors measured
+against those services, and the call-count estimates used to size benchmark
+corpus construction. It reproduces no upstream text — a URL and a measured
+request rate are facts rather than expression — so it is released under
+**CC0 1.0**, which is also what `scripts/make_deposit.py` records for it in the
+deposit licence table. The file carries no `_meta.licence` field of its own;
+this section is its licence record. Its `_meta` marks the entry for review at
+M2 delivery, and if that review changes what the file is built from, the licence
+above is re-checked with it.
+
 ## Status notice
 
 `person_genitive.json` models the latinisation *declension paradigms* behind
