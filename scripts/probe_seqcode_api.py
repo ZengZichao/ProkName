@@ -31,23 +31,28 @@ AGENT = "prokname-provenance-probe/0.1 (https://github.com/ZengZichao/ProkName)"
 
 #: The observations docs/provenance/seqcode-registry-2026-09-25.md records.
 #: `count` is the API's own `response.count`, `pages` its `total_pages`.
+#: Re-measured against the live service on 2026-11-13; the 2026-09-25 values
+#: stay in the provenance record as the dated observation they were.
 RECORDED: dict[str, dict] = {
     "page/status.json": {"status": 200, "json": True, "body": {"status": "ok"}},
     "names.json": {"status": 200, "json": True, "page_size": 30},
-    "names.json?status=public": {"count": 48407, "pages": 1614},
-    "names.json?status=valid": {"count": 39339},
-    "names.json?status=ICNP": {"count": 34951},
-    "names.json?status=SeqCode": {"count": 3350, "pages": 112},
-    "names.json?status=automated": {"count": 9068},
+    "names.json?status=public": {"count": 49304, "pages": 1644},
+    "names.json?status=valid": {"count": 40663},
+    "names.json?status=ICNP": {"count": 36208},
+    "names.json?status=SeqCode": {"count": 3417, "pages": 114},
+    "names.json?status=automated": {"count": 8641},
     "names.json?status=ICNafp": {"count": 1038},
-    # An unrecognised status must stay visibly wrong: it answers count 0, i.e.
-    # "nothing registered", which is why seqcode.py may never map a zero count
-    # onto NOT_FOUND without first validating the status word.
-    "names.json?status=nonsense": {"count": 0},
+    # An unrecognised status word is not rejected and no longer empty: on
+    # 2026-11-13 it answered with the whole registry (52,395) where 2026-09-25
+    # measured count 0. The shape of the lesson is unchanged and sharper — the
+    # service validates nothing, so no count may be mapped onto NOT_FOUND, and
+    # a filter that silently matches everything is worse than one that matches
+    # nothing, because "everything" reads as a successful query.
+    "names.json?status=nonsense": {"count": 52395},
     # Unknown parameters are silently ignored — this is the proof that no
-    # by-name lookup exists, so a single check would need 112..1614 requests.
-    "names.json?name=Escherichia+coli": {"count": 48407},
-    "names.json?search=Escherichia": {"count": 48407},
+    # by-name lookup exists, so a single check would need 114..1644 requests.
+    "names.json?name=Escherichia+coli": {"count": 49304},
+    "names.json?search=Escherichia": {"count": 49304},
     "names.json?per_page=500": {"page_size": 30},
     # Documented as JSON with a worked example URL; in fact serves HTML.
     "names/1.json": {"status": 200, "json": False},

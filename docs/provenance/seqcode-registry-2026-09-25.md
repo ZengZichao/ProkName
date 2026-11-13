@@ -13,8 +13,10 @@ recorded as open questions:
    stated that the repository had never read or quoted the Registry's own
    published terms.
 
-Everything below was read from the live service on **2026-09-25 (UTC)** during
-this repository's own optimization pass. No endpoint was invented; the
+Everything below is dated by the pass that measured it. The record was read from
+the live service on **2026-09-25 (UTC)** during this repository's own
+optimization pass, and the section **"Re-probe — 2026-11-13"** repeats the same
+measurements seven weeks later. No endpoint was invented; the
 `prokname` policy that forbids guessing URLs still holds, and this file exists
 precisely so the policy's evidence lives inside the repository instead of in a
 `/tmp` directory or a maintainer's memory.
@@ -65,7 +67,7 @@ names/(id).json additionally documents rank, status_name, priority_date,
 | --- | --- | --- |
 | `page/status.json` | `{"status": "ok"}` | ✅ as documented |
 | `names.json` parameters | `page`, `status` only | ✅ both honored; **no other parameter is documented and none works** |
-| `names.json?status=…` vocabulary | `public`, `automated`, `SeqCode`, `ICNP`, `ICNafp`, `valid` | ✅ all six return data; **an unknown value returns `count: 0` rather than an error** (silently empty — a typo reads as "nothing registered") |
+| `names.json?status=…` vocabulary | `public`, `automated`, `SeqCode`, `ICNP`, `ICNafp`, `valid` | ✅ all six return data; **an unknown value returns `count: 0` rather than an error** (silently empty — a typo reads as "nothing registered"). *This behaviour no longer holds; see "Re-probe — 2026-11-13".* |
 | `names.json?status=public` | — | `count: 48407`, `total_pages: 1614` |
 | `names.json?status=valid` | — | `count: 39339` |
 | `names.json?status=ICNP` | — | `count: 34951` |
@@ -130,6 +132,47 @@ needs the other authority to answer negatively as well, which is kept as data in
 the same values this probe observed live, which is what settles that the code
 keys on `status=SeqCode` and not on `status=valid` (39 339, twelve times the
 SeqCode count).
+
+## Re-probe — 2026-11-13
+
+The same script, run again seven weeks later against the same endpoints. The
+service's shape is unchanged: still `page` and `status` only, still a fixed
+30-item page, still no lookup by name, still HTML at `names/1.json`, still no
+published rate limit. What changed is the size of the lists and one behaviour
+this record relied on.
+
+| Probe | 2026-09-25 | 2026-11-13 |
+| --- | --- | --- |
+| `status=public` | 48 407 / 1 614 pages | 49 304 / 1 644 pages |
+| `status=valid` | 39 339 | 40 663 |
+| `status=ICNP` | 34 951 | 36 208 |
+| `status=SeqCode` | 3 350 / 112 pages | 3 417 / 114 pages |
+| `status=automated` | 9 068 | 8 641 |
+| `status=ICNafp` | 1 038 | 1 038 |
+| `status=<unrecognised>` | `count: 0` | `count: 52 395` |
+
+**The empty answer became an everything answer.** An unrecognised `status` value
+used to return `count: 0`; it now returns 52 395 rows, more than
+`status=public` — the filter is ignored outright instead of matching nothing.
+The rule drawn from the old behaviour stands, and matters more now: the service
+validates the status word not at all, so no count may be read as a ruling, and
+`seqcode.py` must keep ruling from the snapshot. Of the two failure modes the one
+that silently matches everything is the more dangerous, because it looks like a
+successful query.
+
+**The completeness finding reproduces.** Two consecutive crawls of
+`status=SeqCode` walked 114 pages each and yielded 2 517 and 2 537 unique names,
+sharing only 2 453: 64 names appeared in the first pass and not the second, 84 in
+the second and not the first — while the API reported 3 417 rows for both passes.
+Absence from the snapshot is therefore still not evidence of absence in the
+registry, and the M0 gate stays exactly where the 2026-09-25 record left it.
+
+`scripts/probe_seqcode_api.py`'s `RECORDED` table now carries the 2026-11-13
+numbers, which is what the scheduled live-smoke compares against. The shipped
+snapshot was deliberately **not** rebuilt here: at 49 days it is well inside the
+90-day window `scripts/build_seqcode_snapshot.py` sets, and a rebuild replaces a
+shipped data asset together with every ruling keyed on it — that is its own
+change, with its own date.
 
 ## Licence terms (resolves the question DATA_LICENSE records under "SeqCode Registry data — resolved 2026-09-25")
 

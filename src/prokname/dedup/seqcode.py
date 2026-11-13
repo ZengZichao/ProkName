@@ -11,9 +11,11 @@ scripts/probe_seqcode_api.py. The record produced a surprise that changes the
 design, so it is summarised here rather than left in a document nobody reads:
 
 1. There is no lookup-by-name. `names.json` accepts only `page` and `status`;
-   unknown parameters are silently ignored and return the full 48 407-name
-   list, and the page size is fixed at 30. Asking one question online would
-   cost 112 to 1 614 requests. So the adapter does NOT go online at all: it
+   unknown parameters are silently ignored and return the whole unfiltered
+   list (48 407 names as measured 2026-09-25, 49 304 on the 2026-11-13
+   re-probe), and the page size is fixed at 30. Asking one question online
+   would cost 112 to 1 614 requests then, 114 to 1 644 now. So the adapter
+   does NOT go online at all: it
    rules from a dated local snapshot, the same way the NCBI adapter rules from
    a local taxdump. `allow_network` is accepted and deliberately unused.
 
