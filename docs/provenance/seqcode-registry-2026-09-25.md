@@ -207,3 +207,10 @@ crawl must self-throttle and say so.
 The script prints one line per probe with the observed counts, so drift (an
 endpoint appearing, a parameter starting to work, the detail endpoint starting
 to serve JSON) is visible in seconds and this file can be re-dated.
+
+List sizes alone do not fail it. The registry grows between runs, so a count or
+page total that merely moved is reported as `counts moved` and the exit code
+stays 0; what still fails is a shape change or a count crossing zero, because
+zero-versus-nonzero is the difference between a filter matching nothing and a
+filter being ignored — the change this record documents between 2026-09-25 and
+2026-11-13.
