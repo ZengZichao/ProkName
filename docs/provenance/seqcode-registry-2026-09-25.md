@@ -87,11 +87,12 @@ therefore must NOT be read, on the strength of this record, as entitled to
 answer negatively: the only flag this record justifies is
 `_POSITIVE_RULINGS_VERIFIED = True` in `dedup/seqcode.py`, which covers the
 occupancy findings actually observed, while a name missing from the snapshot
-returns `FOUND_UNKNOWN` and never `not_found`. Items 2 and 5 of the checklist (a
-committed live JSON cassette per endpoint *used*, and a green scheduled
-live-smoke) still stand, and what remains outstanding before this source may
-answer negatively is kept as data in `M0_FLIP_CHECKLIST` in the same module;
-item 1's answer is "the endpoint that would answer this question does not exist".
+returns `FOUND_UNKNOWN` and never `not_found`. The two items that only capture
+can close — a committed live JSON cassette per endpoint *used*, and a green
+scheduled live-smoke — still stand, and what remains outstanding before this
+source may answer negatively is kept as data in `M0_FLIP_CHECKLIST` in the same
+module; the answer recorded there for the lookup-by-name item is that the
+endpoint which would answer this question does not exist.
 
 **2. `status=valid` must never be read as "validly published under SeqCode".**
 It returns 39 339 names, twelve times the `status=SeqCode` count of 3 350. This
@@ -104,15 +105,24 @@ something else upstream. Any future implementation must key on
 **3. The offline-snapshot route is the only viable one, and it is cheap.**
 3 350 SeqCode names × 112 pages at 30/page is a single bounded crawl, the same
 shape as `scripts/rebuild_corpus.py` already does for the LPSN-derived near-name
-corpus. A versioned `seqcode_registered.json` snapshot would let `check` give
-the three currently-unreachable verdicts (`NO_CLEAR_CONFLICT`,
-`VERIFY_WARNING`, `PARAHOMONYM_WARNING`) from local data, which is also what
-M0's "expert-signable, auditable" posture wants: a dated, attributed snapshot
-beats a live call whose answer changes between runs.
+corpus. A versioned `seqcode_registered.json` snapshot lets `check` rule from
+local data instead of spending 112 requests on a single question, which is also
+what M0's "expert-signable, auditable" posture wants: a dated, attributed
+snapshot beats a live call whose answer changes between runs.
 
 That is a design change (new shipped data asset, new refresh cadence, one
-licence obligation now settled — see below), so it is recorded here as the
-recommended path rather than implemented unilaterally.
+licence obligation now settled — see below), and it has since been made:
+`scripts/build_seqcode_snapshot.py` builds
+`src/prokname/data/seqcode_registered.json` and `dedup/seqcode.py` rules from it.
+What that bought is the positive ruling and nothing more — a name found under
+`status=SeqCode` is occupancy evidence, so a genome-based name that SeqCode
+published and LPSN has never heard of now yields `CONFLICT` instead of `BLOCKED`.
+The three clean verdicts (`NO_CLEAR_CONFLICT`, `VERIFY_WARNING`,
+`PARAHOMONYM_WARNING`) remain unreachable through this adapter, and it was the
+same crawl that produced the snapshot which showed why: absence cannot be ruled,
+so a miss answers `FOUND_UNKNOWN` and adjudication stays blocked. Unblocking them
+needs the other authority to answer negatively as well, which is kept as data in
+`M0_FLIP_CHECKLIST` in `dedup/seqcode.py`.
 
 **4. Cross-check of the counts the repository already carries.**
 `seqcode.py`'s docstring reports the full list as 48 407 names and the

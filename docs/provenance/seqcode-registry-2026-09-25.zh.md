@@ -83,10 +83,10 @@ names/(id).json 另外记载 rank, status_name, priority_date,
 `data/rate_limit_budget.json` 想要表达的那份请求预算不相容。因此**绝不能**依据本记录，就把该适配器
 当作有权给出否定答复的一方：本记录所能支持的开关只有 `dedup/seqcode.py` 里的
 `_POSITIVE_RULINGS_VERIFIED = True`，它覆盖的是实际观察到的占用认定；快照中不存在的名字
-返回 `FOUND_UNKNOWN`，绝不返回 `not_found`。清单第 2 与第 5 项（每个*实际使用*的端点都要
-有一份已提交的线上 JSON 录制带，以及一次全绿的计划任务 live-smoke）仍然成立，而在本源
-得以给出否定答复之前仍未了结的事项，以数据形式保存在同一模块的 `M0_FLIP_CHECKLIST` 中；
-第 1 项的答案是“能回答这个问题的端点并不存在”。
+返回 `FOUND_UNKNOWN`，绝不返回 `not_found`。其中只有靠录制才能了结的两项——每个*实际
+使用*的端点都要有一份已提交的线上 JSON 录制带，以及一次全绿的计划任务 live-smoke——
+仍然成立，而在本源得以给出否定答复之前仍未了结的事项，以数据形式保存在同一模块的
+`M0_FLIP_CHECKLIST` 中；该清单里“按名查询”那一项的答案是“能回答这个问题的端点并不存在”。
 
 **2. `status=valid` 绝不可读作“已依 SeqCode 有效发表”。**
 它返回 39 339 个名字，是 `status=SeqCode` 那 3 350 个的十二倍。这正是清单第 3 项所警告
@@ -97,13 +97,19 @@ names/(id).json 另外记载 rank, status_name, priority_date,
 **3. 离线快照这条路是唯一可行的，而且代价很低。**
 3 350 个 SeqCode 名 × 112 页（每页 30 条），是一次有界的抓取，其形状与本仓库
 `scripts/rebuild_corpus.py` 已为 LPSN 衍生近似名语料所做的事相同。一份带版本号的
-`seqcode_registered.json` 快照可以让 `check` 从本地数据给出当前无法达到的三个裁定
-（`NO_CLEAR_CONFLICT`、`VERIFY_WARNING`、`PARAHOMONYM_WARNING`），这也正是 M0 想要的
-“可专家签字、可审计”的姿态：一份有日期、有署名的快照，胜过一次答案每次运行都在变的
-在线调用。
+`seqcode_registered.json` 快照可以让 `check` 依据本地数据作出裁定，而不必为一个问题
+花掉 112 次请求，这也正是 M0 想要的“可专家签字、可审计”的姿态：一份有日期、有署名的
+快照，胜过一次答案每次运行都在变的在线调用。
 
 这是一次设计变更（新增随包数据资产、新增刷新节奏、并了结一项许可义务——见下），
-所以此处按“建议路径”记录，而未单方面实施。
+而它此后确已落地：`scripts/build_seqcode_snapshot.py` 构建
+`src/prokname/data/seqcode_registered.json`，`dedup/seqcode.py` 据此作出裁定。它换来的
+只有肯定答复——在 `status=SeqCode` 之下查到的名字即为占用证据，于是一个以基因组为模式、
+由 SeqCode 发表而 LPSN 从未听说过的名字，如今给出 `CONFLICT` 而不再是 `BLOCKED`。那三个
+干净裁定（`NO_CLEAR_CONFLICT`、`VERIFY_WARNING`、`PARAHOMONYM_WARNING`）经由此适配器仍然
+不可达，而说明原因的正是产出这份快照的同一次抓取：缺席无法被认定，因此未命中只答复
+`FOUND_UNKNOWN`，裁定保持阻塞。要解锁它们，还得另一个权威源同样能给出否定答复，该事项以
+数据形式保存在 `dedup/seqcode.py` 的 `M0_FLIP_CHECKLIST` 中。
 
 **4. 与本仓库已携带的计数交叉核对。**
 `seqcode.py` 的文档字符串报告：全表 48 407 个名字，`status=SeqCode` 抓取为 112 页 /
