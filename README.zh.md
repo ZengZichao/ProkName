@@ -5,6 +5,9 @@
 [![DOI: 10.5281/zenodo.23052777](https://zenodo.org/badge/DOI/10.5281/zenodo.23052777.svg)](https://doi.org/10.5281/zenodo.23052777)
 [![PyPI - Version](https://img.shields.io/pypi/v/prokname)](https://pypi.org/project/prokname/)
 [![Python 3.11-3.14](https://img.shields.io/badge/python-3.11--3.14-blue)](https://pypi.org/project/prokname/)
+[![CI](https://github.com/ZengZichao/ProkName/actions/workflows/ci.yml/badge.svg)](https://github.com/ZengZichao/ProkName/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![ORCID](https://img.shields.io/badge/ORCID-0000--0001--6553--970X-a6ce39?logo=orcid&logoColor=white)](https://orcid.org/0000-0001-6553-970X)
 
 原核生物命名辅助工具。prokname 在 **ICNP**（国际原核生物命名法规）与 **SeqCode**（原核生物序列命名法规）下，为新的原核生物分类单元拟定名称提供确定性、可审计的决策支持。
 
